@@ -4,11 +4,14 @@
 
 **Blocked by:** 01: Project Scaffolding & Sussex Heritage Design Tokens
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Rate definition table configured with 2026/2027 standard weekday vs. peak weekend hourly rates for Newcombe Hall, Jubilee Room, and The Library
-- [ ] Add-on surcharges defined for Main Kitchen and Jubilee Kitchen
-- [ ] Pure functional seam `calculateHireQuote(input)` implemented with full TypeScript types
-- [ ] Calculation engine accurately handles day-of-week detection (off-peak vs peak weekend rates)
-- [ ] Headcount capacity validation warnings returned when expected guests exceed room limits (e.g. >200 in Newcombe Hall)
-- [ ] Automated test suite covering weekday, weekend, multi-room, and kitchen edge cases
+- [x] Rate definition table configured with 2026/2027 standard weekday vs. peak weekend hourly rates for Newcombe Hall, Jubilee Room, and The Library
+- [x] Add-on surcharges defined for Main Kitchen and Jubilee Kitchen
+- [x] Pure functional seam `calculateHireQuote(input)` implemented with full TypeScript types
+- [x] Calculation engine accurately handles day-of-week detection (off-peak vs peak weekend rates)
+- [x] Headcount capacity validation warnings returned when expected guests exceed room limits (e.g. >200 in Newcombe Hall)
+- [x] Automated test suite covering weekday, weekend, multi-room, and kitchen edge cases
+
+## Resolution
+Implemented in `src/domain/pricing.ts` and thoroughly tested in `src/domain/__tests__/pricing.test.ts`. 100% test pass rate.

@@ -6,11 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] Global header component renders King Edward Hall brand identity ("Lindfield 1911")
-- [ ] Desktop navigation provides structured dropdowns for the Three Pillars:
+- [x] Global header component renders King Edward Hall brand identity ("Lindfield 1911")
+- [x] Desktop navigation provides structured dropdowns for the Three Pillars:
   - Room Hire (Newcombe Hall, Jubilee Room, The Library, Kitchens, Rates)
   - Community Events (Village Day, Village Run, Film Nights, Sponsors)
   - About & Support (History, Charity & Donations, Contact, FAQ)
-- [ ] Mobile slide-over navigation drawer with touch-friendly tap targets (>48px)
-- [ ] Persistent `[Book a Room]` CTA button with high-contrast brass styling
-- [ ] Accessible ARIA navigation landmarks and focus states (WCAG AA compliant)
+- [x] Mobile slide-over navigation drawer with touch-friendly tap targets (>48px)
+- [x] Persistent `[Book a Room]` CTA button with high-contrast brass styling
+- [x] Accessible ARIA navigation landmarks and focus states (WCAG AA compliant)

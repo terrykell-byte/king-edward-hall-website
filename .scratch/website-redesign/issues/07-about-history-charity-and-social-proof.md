@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] 1911 founding history timeline (Col. Dudley Sampson opening, WW1 Belgian Red Cross hospital, WW2 Canadian dances, 1977 Jubilee extension)
-- [ ] Registered Charity No. 249649 trust showcase & interactive donation CTA card
-- [ ] Curated 5-star Google review cards featuring verified quotes from event hirers, wedding receptions, and cinema attendees
-- [ ] Clear Facility FAQ addressing common queries and clarifying that the first-floor Lindfield Club (with snooker tables) is a separate private members' club
-- [ ] Management committee and volunteer trustee accreditation
+- [x] 1911 founding history timeline (Col. Dudley Sampson opening, WW1 Belgian Red Cross hospital, WW2 Canadian dances, 1977 Jubilee extension)
+- [x] Registered Charity No. 249649 trust showcase & interactive donation CTA card
+- [x] Curated 5-star Google review cards featuring verified quotes from event hirers, wedding receptions, and cinema attendees
+- [x] Clear Facility FAQ addressing common queries and clarifying that the first-floor Lindfield Club (with snooker tables) is a separate private members' club
+- [x] Management committee and volunteer trustee accreditation
