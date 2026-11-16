@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.gemini/
+upload/
+.system_generated/
+*.log
+.DS_Store
