@@ -12,3 +12,4 @@ upload/
 .gitconfig
 env-setup.exit
 terrykell-byte/
+.cache/
