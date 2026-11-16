@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] Lindfield Village Day hub (Saturday 05/06/2027 date countdown, procession map, 150 stalls, stallholder registration interest form)
-- [ ] Lindfield Village Run hub (Sunday 23/05/2027, 5K & 10K courses, entry fees, start times, route map, terrain advisories, FAQ accordion)
-- [ ] Film Nights cinema hub (upcoming schedule, film genre/rating, £9 ticket online booking counter with instant confirmation)
-- [ ] Community sponsors banner acknowledging local Sussex business supporters
+- [x] Lindfield Village Day hub (Saturday 05/06/2027 date countdown, procession map, 150 stalls, stallholder registration interest form)
+- [x] Lindfield Village Run hub (Sunday 23/05/2027, 5K & 10K courses, entry fees, start times, route map, terrain advisories, FAQ accordion)
+- [x] Film Nights cinema hub (upcoming schedule, film genre/rating, £9 ticket online booking counter with instant confirmation)
+- [x] Community sponsors banner acknowledging local Sussex business supporters

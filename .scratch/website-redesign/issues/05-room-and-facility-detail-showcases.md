@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] Newcombe Hall showcase (15.6m x 8.6m, 200 row / 100 banquet capacity, stage, PA loop, photo gallery)
-- [ ] Jubilee Room showcase (parties, catering, direct garden/entry access, dimension specifications)
-- [ ] The Library showcase (intimate committee meetings, refreshment staging, capacity)
-- [ ] Main Kitchen & Jubilee Kitchen equipment specifications (ovens, hot water boilers, serving hatches)
-- [ ] Clear on-page facility highlights (wheelchair accessible, hearing loop, parking notes)
-- [ ] Direct `[Check Availability & Estimate]` button jumping to the interactive inquiry builder
+- [x] Newcombe Hall showcase (15.6m x 8.6m, 200 row / 100 banquet capacity, stage, PA loop, photo gallery)
+- [x] Jubilee Room showcase (parties, catering, direct garden/entry access, dimension specifications)
+- [x] The Library showcase (intimate committee meetings, refreshment staging, capacity)
+- [x] Main Kitchen & Jubilee Kitchen equipment specifications (ovens, hot water boilers, serving hatches)
+- [x] Clear on-page facility highlights (wheelchair accessible, hearing loop, parking notes)
+- [x] Direct `[Check Availability & Estimate]` button jumping to the interactive inquiry builder

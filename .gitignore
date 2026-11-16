@@ -5,3 +5,9 @@ upload/
 .system_generated/
 *.log
 .DS_Store
+.npm/
+.local/
+.bash*
+.profile
+.gitconfig
+env-setup.exit

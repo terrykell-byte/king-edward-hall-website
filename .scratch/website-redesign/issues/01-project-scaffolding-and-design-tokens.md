@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] Web application initialized with modern toolchain (Vite, React, Tailwind CSS)
-- [ ] Tailwind theme configured with custom brand tokens: `brand-forest`, `brand-brass`, `brand-cream`, `brand-surface`, `brand-text-dark`
-- [ ] Typography tokens set up for editorial serif headers and modern sans-serif body text
-- [ ] Smoke test passes confirming the app builds and renders without errors
+- [x] Web application initialized with modern toolchain (Vite, React, Tailwind CSS)
+- [x] Tailwind theme configured with custom brand tokens: `brand-forest`, `brand-brass`, `brand-cream`, `brand-surface`, `brand-text-dark`
+- [x] Typography tokens set up for editorial serif headers and modern sans-serif body text
+- [x] Smoke test passes confirming the app builds and renders without errors
