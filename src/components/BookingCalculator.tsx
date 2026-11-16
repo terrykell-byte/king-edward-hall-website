@@ -1,6 +1,27 @@
 import { useState, useId } from 'react'
-import { ROOM_RATES, KITCHEN_RATES, calculateHireQuote, RoomId, KitchenId } from '../domain/pricing'
-import { Calendar, Clock, Users, Utensils, CheckCircle, AlertTriangle, Send, Sparkles, Info } from 'lucide-react'
+import { 
+  ROOM_RATES, 
+  KITCHEN_RATES, 
+  EQUIPMENT_RATES, 
+  calculateHireQuote, 
+  generateInquiryMailto,
+  RoomId, 
+  KitchenId,
+  EquipmentId
+} from '../domain/pricing'
+import { 
+  Calendar, 
+  Clock, 
+  Users, 
+  Utensils, 
+  CheckCircle, 
+  AlertTriangle, 
+  Send, 
+  Sparkles, 
+  Info,
+  Mic,
+  Repeat
+} from 'lucide-react'
 
 interface BookingCalculatorProps {
   initialRoomId?: RoomId
@@ -14,7 +35,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
   const [startTime, setStartTime] = useState<string>('14:00')
   const [durationHours, setDurationHours] = useState<number>(4)
   const [kitchenId, setKitchenId] = useState<KitchenId>('none')
+  const [equipmentIds, setEquipmentIds] = useState<EquipmentId[]>([])
   const [guestCount, setGuestCount] = useState<number>(60)
+  const [isRecurring, setIsRecurring] = useState<boolean>(false)
 
   // Contact Details Form
   const [name, setName] = useState('')
@@ -32,10 +55,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
   const quote = calculateHireQuote({
     roomId,
     date,
+    startTime,
     durationHours,
     kitchenId,
+    equipmentIds,
     guestCount
   })
+
+  const toggleEquipment = (eqId: EquipmentId) => {
+    setEquipmentIds(prev => 
+      prev.includes(eqId) ? prev.filter(id => id !== eqId) : [...prev, eqId]
+    )
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +84,15 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
     setFormErrors([])
     setSubmitted(true)
   }
+
+  const mailtoUri = generateInquiryMailto(quote, {
+    name,
+    email,
+    phone,
+    eventDescription: isRecurring ? `${eventDescription} (Recurring Booking Requested)` : eventDescription,
+    date,
+    startTime
+  })
 
   return (
     <div className="max-w-5xl mx-auto my-8 p-6 sm:p-10 bg-brand-surface rounded-2xl shadow-elevated border border-brand-forest/10">
@@ -78,15 +118,19 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
             Inquiry Prepared for Dispatch!
           </h3>
           <p className="text-sm text-brand-text-muted max-w-lg mx-auto mb-6">
-            Thank you, <strong className="text-brand-forest">{name}</strong>. Your provisional booking inquiry for <strong>{quote.roomName}</strong> on <strong>{date}</strong> ({quote.durationHours} hours, est. £{quote.estimatedTotal}) has been logged.
+            Thank you, <strong className="text-brand-forest">{name}</strong>. Your provisional booking inquiry for <strong>{quote.roomName}</strong> on <strong>{date}</strong> ({quote.durationHours} hours, est. £{quote.estimatedTotal}) has been prepared.
           </p>
 
-          <div className="bg-brand-surface p-4 rounded-xl text-left text-xs max-w-md mx-auto space-y-1.5 border border-brand-forest/10 mb-6 font-mono text-brand-text-dark">
+          <div className="bg-brand-surface p-5 rounded-xl text-left text-xs max-w-md mx-auto space-y-1.5 border border-brand-forest/10 mb-6 font-mono text-brand-text-dark">
             <div className="font-bold font-sans text-brand-forest mb-2">Booking Summary:</div>
             <div>• Room: {quote.roomName}</div>
-            <div>• Date: {date} ({quote.isWeekend ? 'Weekend Peak' : 'Weekday Standard'})</div>
+            <div>• Date: {date} ({quote.isPeakRate ? 'Peak Weekend / Evening' : 'Standard Weekday'})</div>
             <div>• Time: {startTime} ({durationHours} hours)</div>
             <div>• Kitchen: {quote.kitchenName} (£{quote.kitchenCost})</div>
+            {quote.equipmentNames.length > 0 && (
+              <div>• Equipment: {quote.equipmentNames.join(', ')} (£{quote.equipmentCost})</div>
+            )}
+            {isRecurring && <div>• Frequency: Recurring Series Requested</div>}
             <div>• Attendees: {guestCount} guests</div>
             <div>• Estimated Total: £{quote.estimatedTotal}</div>
             <div>• Recipient: roomhire@kingedwardhall.org.uk</div>
@@ -94,7 +138,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
 
           <div className="flex justify-center gap-4">
             <a 
-              href={`mailto:roomhire@kingedwardhall.org.uk?subject=Room%20Hire%20Inquiry%20-%20${encodeURIComponent(quote.roomName)}%20(${date})&body=Hello%20Tracy,%0D%0A%0D%0AI%20would%20like%20to%20inquire%20about%20booking%20${encodeURIComponent(quote.roomName)}%20at%20King%20Edward%20Hall.%0D%0A%0D%0ADetails:%0D%0A-%20Date:%20${date}%0D%0A-%20Start%20Time:%20${startTime}%0D%0A-%20Duration:%20${durationHours}%20hours%0D%0A-%20Estimated%20Guests:%20${guestCount}%0D%0A-%20Kitchen:%20${encodeURIComponent(quote.kitchenName)}%0D%0A-%20Estimated%20Hire%20Fee:%20£${quote.estimatedTotal}%0D%0A%0D%0AContact:%0D%0A-%20Name:%20${encodeURIComponent(name)}%0D%0A-%20Phone:%20${encodeURIComponent(phone)}%0D%0A-%20Event:%20${encodeURIComponent(eventDescription)}`}
+              href={mailtoUri}
               className="inline-flex items-center gap-2 bg-brand-forest text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand-forest-light transition-colors shadow-soft"
             >
               <Send className="w-4 h-4" /> Open in Email Client
@@ -165,7 +209,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
                 required
               />
               <span className="text-[11px] text-brand-text-muted block mt-1">
-                {quote.isWeekend ? '🌟 Weekend Peak Rate applies' : '📅 Standard Weekday Rate'}
+                {quote.isPeakRate ? '🌟 Peak Rate (Weekend / Fri Evening)' : '📅 Standard Off-Peak Weekday'}
               </span>
             </div>
 
@@ -213,6 +257,21 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
             </div>
           </div>
 
+          {/* Recurring booking option */}
+          <div className="p-3 bg-brand-cream/40 rounded-xl border border-brand-cream-dark flex items-center gap-3">
+            <input 
+              type="checkbox"
+              id="recurringCheck"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
+              className="rounded text-brand-brass focus:ring-brand-brass"
+            />
+            <label htmlFor="recurringCheck" className="text-xs text-brand-text-dark cursor-pointer flex items-center gap-1.5">
+              <Repeat className="w-3.5 h-3.5 text-brand-brass" />
+              <strong>Recurring Booking:</strong> This is a weekly or monthly class/meeting request.
+            </label>
+          </div>
+
           {/* Capacity warning alert if exceeded */}
           {quote.capacityWarning && (
             <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2">
@@ -252,13 +311,44 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
             </div>
           </div>
 
+          {/* Step 4: Equipment Add-ons */}
+          <div>
+            <label className="block text-sm font-bold uppercase tracking-wider text-brand-forest mb-3 flex items-center gap-2">
+              <Mic className="w-4 h-4 text-brand-brass" /> Step 3: Audio-Visual & Equipment Add-ons (Optional)
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(Object.keys(EQUIPMENT_RATES) as EquipmentId[]).map((eqId) => {
+                const eq = EQUIPMENT_RATES[eqId]
+                const isSelected = equipmentIds.includes(eqId)
+                return (
+                  <button
+                    key={eqId}
+                    type="button"
+                    onClick={() => toggleEquipment(eqId)}
+                    className={`text-left p-4 rounded-xl border transition-all flex justify-between items-start ${
+                      isSelected
+                        ? 'border-brand-forest bg-brand-forest/5 ring-1 ring-brand-forest'
+                        : 'border-brand-cream-dark bg-brand-surface hover:border-brand-brass/40'
+                    }`}
+                  >
+                    <div>
+                      <span className="font-semibold text-sm text-brand-forest-dark block">{eq.name}</span>
+                      <span className="text-xs text-brand-text-muted">{eq.description}</span>
+                    </div>
+                    <span className="text-xs font-bold text-brand-forest shrink-0 ml-3">+£{eq.flatRate}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           {/* Live Quote Breakdown Card */}
           <div className="bg-brand-forest text-brand-cream p-6 rounded-2xl shadow-soft">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-brand-forest-light pb-4 mb-4">
               <div>
                 <span className="text-xs uppercase tracking-wider text-brand-brass-light font-bold">Estimated Cost Breakdown</span>
                 <h3 className="font-serif text-xl font-bold text-white mt-0.5">{quote.roomName}</h3>
-                <span className="text-xs text-brand-cream/80">{quote.durationHours} hours @ £{quote.hourlyRate}/hr ({quote.isWeekend ? 'Weekend' : 'Weekday'})</span>
+                <span className="text-xs text-brand-cream/80">{quote.durationHours} hours @ £{quote.hourlyRate}/hr ({quote.isPeakRate ? 'Peak Weekend / Evening' : 'Standard Weekday'})</span>
               </div>
               <div className="text-right">
                 <span className="text-xs text-brand-cream/70 block">Estimated Hire Fee</span>
@@ -266,17 +356,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({ initialRoo
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-brand-cream/80">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-brand-cream/80">
               <div>• Base Room Fee: <strong className="text-white">£{quote.totalRoomCost}</strong></div>
-              <div>• Kitchen Catering Fee: <strong className="text-white">£{quote.kitchenCost}</strong></div>
-              <div>• Cleaning & Facilities: <strong className="text-emerald-300">Included</strong></div>
+              <div>• Kitchen Fee: <strong className="text-white">£{quote.kitchenCost}</strong></div>
+              <div>• Equipment Fee: <strong className="text-white">£{quote.equipmentCost}</strong></div>
+              <div>• Cleaning & Setup: <strong className="text-emerald-300">Included</strong></div>
             </div>
           </div>
 
-          {/* Step 4: Contact Details & Submit */}
+          {/* Step 5: Contact Details & Submit */}
           <div className="border-t border-brand-cream-dark pt-6">
             <label className="block text-sm font-bold uppercase tracking-wider text-brand-forest mb-4">
-              Step 3: Your Contact Details & Event Details
+              Step 4: Your Contact Details & Event Details
             </label>
 
             {formErrors.length > 0 && (

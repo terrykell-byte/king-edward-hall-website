@@ -1,9 +1,18 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { TabId } from './Header'
-import { Check, Ticket, ChevronDown, ChevronUp } from 'lucide-react'
+import { 
+  Check, 
+  Ticket, 
+  ChevronDown, 
+  ChevronUp, 
+  Clock, 
+  UserPlus, 
+  HeartHandshake, 
+  Send 
+} from 'lucide-react'
 
 interface EventHubsProps {
-  currentEvent: 'all' | 'village-day' | 'village-run' | 'film-nights'
+  currentEvent: 'all' | 'village-day' | 'village-run' | 'film-nights' | 'sponsors'
   setActiveTab: (tab: TabId) => void
 }
 
@@ -18,8 +27,25 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
   const [stallCategory, setStallCategory] = useState('crafts')
   const [stallSubmitted, setStallSubmitted] = useState(false)
 
+  // Village Run Registration State
+  const [runnerName, setRunnerName] = useState('')
+  const [runnerEmail, setRunnerEmail] = useState('')
+  const [runnerRace, setRunnerRace] = useState<'5k' | '10k'>('10k')
+  const [runnerRegistered, setRunnerRegistered] = useState(false)
+
   // Village Run FAQ accordion
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+
+  // Calculate days remaining to Village Run (23/05/2027) and Village Day (05/06/2027)
+  const calculateDaysRemaining = (targetDateString: string) => {
+    const target = new Date(targetDateString).getTime()
+    const now = Date.now()
+    const diff = target - now
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+  }
+
+  const runDays = calculateDaysRemaining('2027-05-23T10:30:00')
+  const dayDays = calculateDaysRemaining('2027-06-05T12:00:00')
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
@@ -57,6 +83,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
         >
           Film Nights Cinema
         </button>
+        <button
+          onClick={() => setActiveTab('event-sponsors')}
+          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+            currentEvent === 'sponsors' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
+          }`}
+        >
+          Community Sponsors
+        </button>
       </div>
 
       {/* ALL EVENTS OVERVIEW */}
@@ -78,9 +112,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             {/* Card 1: Village Day */}
             <div className="bg-brand-surface rounded-2xl p-6 border border-brand-forest/10 shadow-soft hover:shadow-elevated transition-all flex flex-col justify-between">
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase mb-3">
-                  Saturday 05/06/2027 • 49th Year
-                </span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase">
+                    Saturday 05/06/2027
+                  </span>
+                  <span className="text-xs font-bold text-amber-800 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> {dayDays} Days
+                  </span>
+                </div>
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Lindfield Village Day
                 </h3>
@@ -99,9 +138,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             {/* Card 2: Village Run */}
             <div className="bg-brand-surface rounded-2xl p-6 border border-brand-forest/10 shadow-soft hover:shadow-elevated transition-all flex flex-col justify-between">
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-bold uppercase mb-3">
-                  Sunday 23/05/2027 • Cross-Country
-                </span>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-bold uppercase">
+                    Sunday 23/05/2027
+                  </span>
+                  <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> {runDays} Days
+                  </span>
+                </div>
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Lindfield Village Run
                 </h3>
@@ -113,16 +157,18 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                 onClick={() => setActiveTab('event-village-run')}
                 className="w-full bg-brand-forest text-white text-xs font-bold py-2.5 rounded-lg hover:bg-brand-forest-light transition-colors"
               >
-                View Race Guide & 2027 Info
+                View Race Guide & Enter Run
               </button>
             </div>
 
             {/* Card 3: Film Nights */}
             <div className="bg-brand-surface rounded-2xl p-6 border border-brand-forest/10 shadow-soft hover:shadow-elevated transition-all flex flex-col justify-between">
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-900 text-[11px] font-bold uppercase mb-3">
-                  Monthly Cinema • Newcombe Hall
-                </span>
+                <div className="mb-3">
+                  <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-900 text-[11px] font-bold uppercase">
+                    Monthly Cinema • Newcombe Hall
+                  </span>
+                </div>
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Film Nights Cinema
                 </h3>
@@ -145,9 +191,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {currentEvent === 'village-day' && (
         <div className="space-y-10 animate-in fade-in duration-200">
           <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-brand-forest to-brand-forest-dark text-brand-cream relative overflow-hidden shadow-elevated">
-            <span className="px-3 py-1 rounded-full bg-brand-brass text-brand-forest-dark text-xs font-bold uppercase mb-3 inline-block">
-              Save the Date • 05/06/2027
-            </span>
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              <span className="px-3 py-1 rounded-full bg-brand-brass text-brand-forest-dark text-xs font-bold uppercase">
+                Save the Date • 05/06/2027
+              </span>
+              <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Countdown: {dayDays} Days Until Village Day
+              </span>
+            </div>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
               Lindfield Village Day 2027
             </h1>
@@ -254,9 +305,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {currentEvent === 'village-run' && (
         <div className="space-y-10 animate-in fade-in duration-200">
           <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-emerald-900 to-brand-forest-dark text-white relative shadow-elevated">
-            <span className="px-3 py-1 rounded-full bg-emerald-400 text-emerald-950 text-xs font-bold uppercase mb-3 inline-block">
-              Sunday 23/05/2027 • Chip Timed
-            </span>
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              <span className="px-3 py-1 rounded-full bg-emerald-400 text-emerald-950 text-xs font-bold uppercase">
+                Sunday 23/05/2027 • Chip Timed
+              </span>
+              <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Countdown: {runDays} Days Until Race Day
+              </span>
+            </div>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
               Lindfield Village Run 5K & 10K
             </h1>
@@ -283,35 +339,117 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             </div>
           </div>
 
-          {/* Race Day Accordion FAQs */}
-          <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 space-y-4">
-            <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Runner Information & FAQs</h3>
-            
-            <div className="space-y-2">
-              {[
-                { q: "Where does the race start and finish?", a: "The race starts and finishes at Hickmans Lane Recreation Ground in Lindfield, where bag drop tents, refreshments, and first aid are stationed." },
-                { q: "What is the trail terrain like?", a: "Both the 5K and 10K are true rural cross-country routes involving uneven grass, stile crossings, step climbs, and occasional muddy sections depending on weather." },
-                { q: "Are headphones permitted?", a: "No. Because the route crosses active country roads and footpaths, headphones are strictly banned for participant safety and awareness of marshals." },
-                { q: "Are water stations provided?", a: "Yes. Water points are stationed at the start/finish area plus 3 course points on the 10K route and 1 water point on the 5K route." }
-              ].map((faq, index) => {
-                const isOpen = openFaq === index
-                return (
-                  <div key={index} className="border border-brand-cream-dark rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => setOpenFaq(isOpen ? null : index)}
-                      className="w-full text-left p-4 text-xs sm:text-sm font-semibold flex justify-between items-center bg-brand-cream hover:bg-brand-cream-dark transition-colors"
-                    >
-                      <span>{faq.q}</span>
-                      {isOpen ? <ChevronUp className="w-4 h-4 text-brand-forest" /> : <ChevronDown className="w-4 h-4 text-brand-text-muted" />}
-                    </button>
-                    {isOpen && (
-                      <div className="p-4 text-xs text-brand-text-muted bg-white border-t border-brand-cream-dark leading-relaxed">
-                        {faq.a}
-                      </div>
-                    )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Race Entry Form */}
+            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 shadow-soft">
+              <div className="flex items-center gap-2 text-brand-forest font-serif font-bold text-xl mb-1">
+                <UserPlus className="w-5 h-5 text-brand-brass" /> Runner Pre-Registration
+              </div>
+              <p className="text-xs text-brand-text-muted mb-4">
+                Both 5K and 10K entries sold out early in 2026. Pre-register your spot to guarantee your timing chip and commemorative medal.
+              </p>
+
+              {runnerRegistered ? (
+                <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-2">
+                  <Check className="w-8 h-8 text-emerald-600 mx-auto" />
+                  <h4 className="font-serif text-lg font-bold">Registration Logged!</h4>
+                  <p className="text-xs text-brand-text-muted">
+                    Thank you, <strong>{runnerName}</strong>. You are provisional for the <strong>{runnerRace.toUpperCase()} race</strong>. Check {runnerEmail} for full race pack details.
+                  </p>
+                  <button onClick={() => setRunnerRegistered(false)} className="text-xs text-brand-forest underline pt-2 block mx-auto">
+                    Register another runner
+                  </button>
+                </div>
+              ) : (
+                <form 
+                  onSubmit={(e) => { e.preventDefault(); setRunnerRegistered(true); }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-xs font-semibold text-brand-text-dark mb-1">Runner Full Name *</label>
+                    <input 
+                      type="text" 
+                      value={runnerName} 
+                      onChange={(e) => setRunnerName(e.target.value)} 
+                      placeholder="e.g. David Thompson"
+                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      required
+                    />
                   </div>
-                )
-              })}
+                  <div>
+                    <label className="block text-xs font-semibold text-brand-text-dark mb-1">Email Address *</label>
+                    <input 
+                      type="email" 
+                      value={runnerEmail} 
+                      onChange={(e) => setRunnerEmail(e.target.value)} 
+                      placeholder="david@example.com"
+                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-brand-text-dark mb-1">Choose Distance</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRunnerRace('5k')}
+                        className={`p-3 rounded-lg text-xs font-bold border transition-colors ${
+                          runnerRace === '5k' ? 'bg-brand-forest text-white border-brand-forest' : 'bg-brand-cream border-brand-cream-dark'
+                        }`}
+                      >
+                        5K Cross-Country (£10)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRunnerRace('10k')}
+                        className={`p-3 rounded-lg text-xs font-bold border transition-colors ${
+                          runnerRace === '10k' ? 'bg-brand-forest text-white border-brand-forest' : 'bg-brand-cream border-brand-cream-dark'
+                        }`}
+                      >
+                        10K Cross-Country (£20)
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-brand-forest hover:bg-brand-forest-light text-white py-3 rounded-lg text-xs font-bold transition-colors shadow-soft"
+                  >
+                    Submit Race Entry Request
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Race Day Accordion FAQs */}
+            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 space-y-4">
+              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Runner Information & FAQs</h3>
+              
+              <div className="space-y-2">
+                {[
+                  { q: "Where does the race start and finish?", a: "The race starts and finishes at Hickmans Lane Recreation Ground in Lindfield, where bag drop tents, refreshments, and first aid are stationed." },
+                  { q: "What is the trail terrain like?", a: "Both the 5K and 10K are true rural cross-country routes involving uneven grass, stile crossings, step climbs, and occasional muddy sections depending on weather." },
+                  { q: "Are headphones permitted?", a: "No. Because the route crosses active country roads and footpaths, headphones are strictly banned for participant safety and awareness of marshals." },
+                  { q: "Are water stations provided?", a: "Yes. Water points are stationed at the start/finish area plus 3 course points on the 10K route and 1 water point on the 5K route." }
+                ].map((faq, index) => {
+                  const isOpen = openFaq === index
+                  return (
+                    <div key={index} className="border border-brand-cream-dark rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => setOpenFaq(isOpen ? null : index)}
+                        className="w-full text-left p-4 text-xs sm:text-sm font-semibold flex justify-between items-center bg-brand-cream hover:bg-brand-cream-dark transition-colors"
+                      >
+                        <span>{faq.q}</span>
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-brand-forest" /> : <ChevronDown className="w-4 h-4 text-brand-text-muted" />}
+                      </button>
+                      {isOpen && (
+                        <div className="p-4 text-xs text-brand-text-muted bg-white border-t border-brand-cream-dark leading-relaxed">
+                          {faq.a}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -433,6 +571,55 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SPONSORS ARCHIVE HUB */}
+      {currentEvent === 'sponsors' && (
+        <div className="space-y-10 animate-in fade-in duration-200">
+          <div className="text-center max-w-3xl mx-auto mb-8">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-brass block mb-1">
+              Local Businesses Giving Back
+            </span>
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-forest-dark mb-3">
+              Community Event Sponsors
+            </h1>
+            <p className="text-sm text-brand-text-muted leading-relaxed">
+              Lindfield Village Day and the Lindfield Village Run are made possible through the generous support of local businesses, family firms, and regional partners.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { name: 'Hamptons Estate Agents', category: 'Headline Village Day Sponsor' },
+              { name: 'RTFJ Fine Jewellery', category: 'Major Village Run Sponsor' },
+              { name: 'UpCountry Garden Store', category: 'Arena & Grounds Partner' },
+              { name: 'Lindfield Life Magazine', category: 'Official Media Partner' },
+              { name: 'Mid Downs Radio', category: 'Live Broadcast Sponsor' },
+              { name: 'Claire Nash Solicitors', category: 'Community Event Supporter' },
+              { name: 'Oathall Veterinary Group', category: 'Children’s Dog Show Sponsor' },
+              { name: 'Lindfield Parish Council', category: 'Civic Grant Partner' }
+            ].map((sponsor, i) => (
+              <div key={i} className="bg-brand-surface p-6 rounded-2xl border border-brand-forest/10 shadow-soft text-center flex flex-col justify-center">
+                <HeartHandshake className="w-8 h-8 text-brand-brass mx-auto mb-3" />
+                <h4 className="font-serif text-base font-bold text-brand-forest-dark mb-1">{sponsor.name}</h4>
+                <span className="text-[11px] text-brand-text-muted">{sponsor.category}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-8 rounded-2xl bg-brand-cream border border-brand-cream-dark text-center max-w-2xl mx-auto space-y-3">
+            <h4 className="font-serif text-xl font-bold text-brand-forest-dark">Become a 2027 Event Sponsor</h4>
+            <p className="text-xs text-brand-text-muted">
+              Connect your business with over 10,000 local Sussex residents while directly funding the preservation of King Edward Hall.
+            </p>
+            <a 
+              href="mailto:villageday@kingedwardhall.org.uk?subject=2027%20Sponsorship%20Inquiry"
+              className="inline-flex items-center gap-2 bg-brand-forest text-white px-5 py-2.5 rounded-lg text-xs font-bold hover:bg-brand-forest-light transition-colors"
+            >
+              <Send className="w-3.5 h-3.5" /> Inquire About Business Sponsorship
+            </a>
           </div>
         </div>
       )}

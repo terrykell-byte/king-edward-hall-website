@@ -5,6 +5,7 @@ import { BookingCalculator } from './components/BookingCalculator'
 import { RoomShowcases } from './components/RoomShowcases'
 import { EventHubs } from './components/EventHubs'
 import { AboutAndCharity } from './components/AboutAndCharity'
+import { ROOM_RATES, KITCHEN_RATES } from './domain/pricing'
 import { 
   Calendar, 
   Star, 
@@ -89,10 +90,10 @@ export function App() {
                       className="p-3 rounded-xl bg-brand-cream hover:bg-brand-cream-dark cursor-pointer transition-colors flex justify-between items-center"
                     >
                       <div>
-                        <strong className="text-sm font-serif text-brand-forest-dark block">Newcombe Hall</strong>
-                        <span className="text-xs text-brand-text-muted">Weddings, shows & balls • 200 max</span>
+                        <strong className="text-sm font-serif text-brand-forest-dark block">{ROOM_RATES.newcombe.name}</strong>
+                        <span className="text-xs text-brand-text-muted">Weddings, shows & balls • {ROOM_RATES.newcombe.maxCapacity} max</span>
                       </div>
-                      <span className="text-xs font-bold text-brand-forest">from £28/hr</span>
+                      <span className="text-xs font-bold text-brand-forest">from £{ROOM_RATES.newcombe.weekdayRate}/hr</span>
                     </div>
 
                     <div 
@@ -100,10 +101,10 @@ export function App() {
                       className="p-3 rounded-xl bg-brand-cream hover:bg-brand-cream-dark cursor-pointer transition-colors flex justify-between items-center"
                     >
                       <div>
-                        <strong className="text-sm font-serif text-brand-forest-dark block">Jubilee Room</strong>
-                        <span className="text-xs text-brand-text-muted">Children's parties & classes • 60 max</span>
+                        <strong className="text-sm font-serif text-brand-forest-dark block">{ROOM_RATES.jubilee.name}</strong>
+                        <span className="text-xs text-brand-text-muted">Children's parties & classes • {ROOM_RATES.jubilee.maxCapacity} max</span>
                       </div>
-                      <span className="text-xs font-bold text-brand-forest">from £18/hr</span>
+                      <span className="text-xs font-bold text-brand-forest">from £{ROOM_RATES.jubilee.weekdayRate}/hr</span>
                     </div>
 
                     <div 
@@ -111,10 +112,10 @@ export function App() {
                       className="p-3 rounded-xl bg-brand-cream hover:bg-brand-cream-dark cursor-pointer transition-colors flex justify-between items-center"
                     >
                       <div>
-                        <strong className="text-sm font-serif text-brand-forest-dark block">The Library</strong>
-                        <span className="text-xs text-brand-text-muted">Meetings & seminars • 30 max</span>
+                        <strong className="text-sm font-serif text-brand-forest-dark block">{ROOM_RATES.library.name}</strong>
+                        <span className="text-xs text-brand-text-muted">Meetings & seminars • {ROOM_RATES.library.maxCapacity} max</span>
                       </div>
-                      <span className="text-xs font-bold text-brand-forest">from £14/hr</span>
+                      <span className="text-xs font-bold text-brand-forest">from £{ROOM_RATES.library.weekdayRate}/hr</span>
                     </div>
                   </div>
 
@@ -257,49 +258,49 @@ export function App() {
                 </thead>
                 <tbody className="divide-y divide-brand-cream-dark text-brand-text-dark">
                   <tr>
-                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">The Newcombe Hall</td>
-                    <td className="py-3.5 px-4 text-brand-text-muted">15.6m × 8.6m</td>
-                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">200 seated</span></td>
-                    <td className="py-3.5 px-4 font-semibold">£28.00 / hour</td>
-                    <td className="py-3.5 px-4 font-bold text-brand-brass">£38.00 / hour</td>
+                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">{ROOM_RATES.newcombe.name}</td>
+                    <td className="py-3.5 px-4 text-brand-text-muted">{ROOM_RATES.newcombe.dimensions}</td>
+                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">{ROOM_RATES.newcombe.maxCapacity} seated</span></td>
+                    <td className="py-3.5 px-4 font-semibold">£{ROOM_RATES.newcombe.weekdayRate}.00 / hour</td>
+                    <td className="py-3.5 px-4 font-bold text-brand-brass">£{ROOM_RATES.newcombe.weekendRate}.00 / hour</td>
                     <td className="py-3.5 px-4 text-right">
                       <button onClick={() => setActiveTab('room-newcombe')} className="text-brand-forest hover:underline font-bold">Details →</button>
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">The Jubilee Room</td>
-                    <td className="py-3.5 px-4 text-brand-text-muted">9.2m × 6.1m</td>
-                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">60 seated</span></td>
-                    <td className="py-3.5 px-4 font-semibold">£18.00 / hour</td>
-                    <td className="py-3.5 px-4 font-bold text-brand-brass">£24.00 / hour</td>
+                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">{ROOM_RATES.jubilee.name}</td>
+                    <td className="py-3.5 px-4 text-brand-text-muted">{ROOM_RATES.jubilee.dimensions}</td>
+                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">{ROOM_RATES.jubilee.maxCapacity} seated</span></td>
+                    <td className="py-3.5 px-4 font-semibold">£{ROOM_RATES.jubilee.weekdayRate}.00 / hour</td>
+                    <td className="py-3.5 px-4 font-bold text-brand-brass">£{ROOM_RATES.jubilee.weekendRate}.00 / hour</td>
                     <td className="py-3.5 px-4 text-right">
                       <button onClick={() => setActiveTab('room-jubilee')} className="text-brand-forest hover:underline font-bold">Details →</button>
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">The Library</td>
-                    <td className="py-3.5 px-4 text-brand-text-muted">6.4m × 4.8m</td>
-                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">30 seated</span></td>
-                    <td className="py-3.5 px-4 font-semibold">£14.00 / hour</td>
-                    <td className="py-3.5 px-4 font-bold text-brand-brass">£18.00 / hour</td>
+                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">{ROOM_RATES.library.name}</td>
+                    <td className="py-3.5 px-4 text-brand-text-muted">{ROOM_RATES.library.dimensions}</td>
+                    <td className="py-3.5 px-4"><span className="bg-brand-forest/10 text-brand-forest px-2 py-0.5 rounded font-bold">{ROOM_RATES.library.maxCapacity} seated</span></td>
+                    <td className="py-3.5 px-4 font-semibold">£{ROOM_RATES.library.weekdayRate}.00 / hour</td>
+                    <td className="py-3.5 px-4 font-bold text-brand-brass">£{ROOM_RATES.library.weekendRate}.00 / hour</td>
                     <td className="py-3.5 px-4 text-right">
                       <button onClick={() => setActiveTab('room-library')} className="text-brand-forest hover:underline font-bold">Details →</button>
                     </td>
                   </tr>
                   <tr className="bg-brand-cream/50">
-                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">Main Commercial Kitchen</td>
+                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">{KITCHEN_RATES.main_kitchen.name}</td>
                     <td className="py-3.5 px-4 text-brand-text-muted">Full catering</td>
                     <td className="py-3.5 px-4 text-brand-text-muted">Commercial</td>
-                    <td className="py-3.5 px-4 font-semibold" colSpan={2}>£25.00 flat fee per session</td>
+                    <td className="py-3.5 px-4 font-semibold" colSpan={2}>£{KITCHEN_RATES.main_kitchen.flatRate}.00 flat fee per session</td>
                     <td className="py-3.5 px-4 text-right">
                       <button onClick={() => setActiveTab('kitchens')} className="text-brand-forest hover:underline font-bold">Details →</button>
                     </td>
                   </tr>
                   <tr className="bg-brand-cream/50">
-                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">Jubilee Kitchenette</td>
+                    <td className="py-3.5 px-4 font-semibold text-brand-forest-dark">{KITCHEN_RATES.jubilee_kitchen.name}</td>
                     <td className="py-3.5 px-4 text-brand-text-muted">Tea & cake service</td>
                     <td className="py-3.5 px-4 text-brand-text-muted">Domestic</td>
-                    <td className="py-3.5 px-4 font-semibold" colSpan={2}>£15.00 flat fee per session</td>
+                    <td className="py-3.5 px-4 font-semibold" colSpan={2}>£{KITCHEN_RATES.jubilee_kitchen.flatRate}.00 flat fee per session</td>
                     <td className="py-3.5 px-4 text-right">
                       <button onClick={() => setActiveTab('kitchens')} className="text-brand-forest hover:underline font-bold">Details →</button>
                     </td>
@@ -327,6 +328,7 @@ export function App() {
     if (activeTab === 'event-village-day') return <EventHubs currentEvent="village-day" setActiveTab={setActiveTab} />
     if (activeTab === 'event-village-run') return <EventHubs currentEvent="village-run" setActiveTab={setActiveTab} />
     if (activeTab === 'event-film-nights') return <EventHubs currentEvent="film-nights" setActiveTab={setActiveTab} />
+    if (activeTab === 'event-sponsors') return <EventHubs currentEvent="sponsors" setActiveTab={setActiveTab} />
 
     // 5. ABOUT, HISTORY, CHARITY & FAQ
     if (activeTab === 'about') return <AboutAndCharity section="about" setActiveTab={setActiveTab} />

@@ -13,6 +13,7 @@ export type TabId =
   | 'event-village-day' 
   | 'event-village-run' 
   | 'event-film-nights'
+  | 'event-sponsors'
   | 'about' 
   | 'history' 
   | 'donate' 
@@ -173,6 +174,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                     <span>Film Nights Cinema</span>
                     <span className="text-[10px] bg-purple-100 text-purple-800 font-medium px-1.5 py-0.5 rounded">£9 Tickets</span>
                   </button>
+                  <button onClick={() => handleNav('event-sponsors')} className="w-full text-left px-4 py-2 text-sm text-brand-text-dark hover:bg-brand-cream flex justify-between items-center">
+                    <span>Community Sponsors</span>
+                    <span className="text-[10px] bg-amber-100 text-amber-800 font-medium px-1.5 py-0.5 rounded">Partners</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -273,6 +278,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               <button onClick={() => handleNav('event-film-nights')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
                 <span>Film Nights Cinema Tickets</span>
                 <span className="text-xs text-brand-forest font-bold">£9</span>
+              </button>
+              <button onClick={() => handleNav('event-sponsors')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
+                <span>Community Sponsors</span>
+                <span className="text-xs text-brand-brass font-bold">Partners</span>
               </button>
             </div>
           </div>

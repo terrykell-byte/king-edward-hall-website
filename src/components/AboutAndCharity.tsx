@@ -1,16 +1,107 @@
 import { useState } from 'react'
 import { TabId } from './Header'
-import { Heart, Star, ShieldCheck, Building } from 'lucide-react'
+import { 
+  Heart, 
+  Star, 
+  ShieldCheck, 
+  Building, 
+  ChevronLeft, 
+  ChevronRight, 
+  Filter, 
+  Quote 
+} from 'lucide-react'
 
 interface AboutAndCharityProps {
   section: 'about' | 'history' | 'donate' | 'faq' | 'contact'
   setActiveTab: (tab: TabId) => void
 }
 
+interface Testimonial {
+  id: string
+  initials: string
+  author: string
+  category: 'wedding' | 'party' | 'community' | 'cinema'
+  rating: number
+  event: string
+  quote: string
+  source: string
+}
+
+const TESTIMONIALS: Testimonial[] = [
+  {
+    id: '1',
+    initials: 'T.W.',
+    author: 'Trevor Weeks MBE',
+    category: 'wedding',
+    rating: 5,
+    event: 'Wedding Reception & Celebration',
+    quote: 'A really good sized hall with a raised stage. Lovely warm atmosphere and an unbeatable picturesque location opposite the village duck pond.',
+    source: 'Google Verified Review'
+  },
+  {
+    id: '2',
+    initials: 'P.S.',
+    author: 'Patrícia S.',
+    category: 'community',
+    rating: 5,
+    event: 'Community Arts & Schedule',
+    quote: 'I really like how the community makes use of the place; there is always something going on and it is well worth keeping up with the schedule.',
+    source: 'Google Verified Review'
+  },
+  {
+    id: '3',
+    initials: 'S.G.',
+    author: 'Stephen G.',
+    category: 'cinema',
+    rating: 5,
+    event: 'Film Night Showing',
+    quote: 'Attended the cinema night. Great movie, superb sound setup, and wonderful tea and homemade cakes during intermission.',
+    source: 'Google Verified Review'
+  },
+  {
+    id: '4',
+    initials: 'G.B.',
+    author: 'Gordon B.',
+    category: 'community',
+    rating: 5,
+    event: 'Weekly Art Society',
+    quote: 'The centre is quite large with a main hall and side rooms. Wheelchair accessible ramp entrance and accessible facilities. The venue is really well maintained.',
+    source: 'Local Hirer'
+  },
+  {
+    id: '5',
+    initials: 'P.G.',
+    author: 'Pina G.',
+    category: 'party',
+    rating: 5,
+    event: 'Wellbeing Workshop',
+    quote: 'Had the most incredible sound bath experience here. The acoustic resonance in Newcombe Hall is absolutely magical.',
+    source: 'Google Verified Review'
+  }
+]
+
 export const AboutAndCharity: React.FC<AboutAndCharityProps> = ({ section, setActiveTab }) => {
   const [donationAmount, setDonationAmount] = useState<number>(25)
   const [giftAid, setGiftAid] = useState<boolean>(true)
   const [donated, setDonated] = useState<boolean>(false)
+
+  // Testimonial Carousel state
+  const [testimonialCategory, setTestimonialCategory] = useState<string>('all')
+  const [currentSlide, setCurrentSlide] = useState<number>(0)
+
+  const filteredTestimonials = testimonialCategory === 'all' 
+    ? TESTIMONIALS 
+    : TESTIMONIALS.filter(t => t.category === testimonialCategory)
+
+  const activeTestimonial = filteredTestimonials[currentSlide % filteredTestimonials.length]
+
+  const nextTestimonial = () => {
+    setCurrentSlide(prev => (prev + 1) % filteredTestimonials.length)
+  }
+
+  const prevTestimonial = () => {
+    setCurrentSlide(prev => (prev - 1 + filteredTestimonials.length) % filteredTestimonials.length)
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
@@ -92,35 +183,81 @@ export const AboutAndCharity: React.FC<AboutAndCharityProps> = ({ section, setAc
               </div>
             </div>
 
-            {/* Curated Social Proof Testimonials */}
+            {/* Curated Interactive Review Carousel with Category Filters & Initials */}
             <div className="space-y-4">
-              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">What Hirers & Visitors Say</h3>
-
-              <div className="p-5 rounded-xl bg-brand-surface border border-brand-forest/10 shadow-soft">
-                <div className="flex items-center gap-1 text-amber-500 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
+              <div className="flex justify-between items-center">
+                <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Verified Hirer Testimonials</h3>
+                
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1 text-[11px]">
+                  <Filter className="w-3.5 h-3.5 text-brand-brass mr-1" />
+                  {['all', 'wedding', 'party', 'cinema'].map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => { setTestimonialCategory(cat); setCurrentSlide(0); }}
+                      className={`px-2 py-0.5 rounded capitalize ${
+                        testimonialCategory === cat ? 'bg-brand-forest text-white font-bold' : 'text-brand-text-muted hover:bg-brand-cream'
+                      }`}
+                    >
+                      {cat}
+                    </button>
                   ))}
-                  <span className="text-xs font-bold text-brand-text-dark ml-2">Wedding Reception & Dance</span>
                 </div>
-                <p className="text-xs text-brand-text-muted italic leading-relaxed mb-2">
-                  "A really good-sized hall with a raised proscenium stage. Lovely warm atmosphere and an unbeatable picturesque location opposite the village duck pond."
-                </p>
-                <span className="text-[11px] font-bold text-brand-forest">— Trevor Weeks MBE, Google Verified Review</span>
               </div>
 
-              <div className="p-5 rounded-xl bg-brand-surface border border-brand-forest/10 shadow-soft">
-                <div className="flex items-center gap-1 text-amber-500 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
-                  ))}
-                  <span className="text-xs font-bold text-brand-text-dark ml-2">Community Event Hirer</span>
+              {activeTestimonial && (
+                <div className="p-6 rounded-2xl bg-brand-surface border border-brand-forest/15 shadow-elevated relative flex flex-col justify-between min-h-[200px]">
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-brand-brass/20 text-brand-forest font-bold text-xs flex items-center justify-center">
+                          {activeTestimonial.initials}
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-brand-forest-dark block">{activeTestimonial.author}</span>
+                          <span className="text-[11px] text-brand-text-muted">{activeTestimonial.event}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex text-amber-400">
+                        {[...Array(activeTestimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="relative pl-6 pr-2 my-2">
+                      <Quote className="w-4 h-4 text-brand-brass/50 absolute left-0 top-0" />
+                      <p className="text-xs sm:text-sm text-brand-text-dark italic leading-relaxed">
+                        "{activeTestimonial.quote}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-brand-cream-dark text-xs">
+                    <span className="text-[11px] text-brand-text-muted">{activeTestimonial.source}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={prevTestimonial}
+                        className="p-1 rounded hover:bg-brand-cream text-brand-text-muted hover:text-brand-forest"
+                        aria-label="Previous testimonial"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <span className="text-[11px] font-mono">
+                        {(currentSlide % filteredTestimonials.length) + 1} / {filteredTestimonials.length}
+                      </span>
+                      <button
+                        onClick={nextTestimonial}
+                        className="p-1 rounded hover:bg-brand-cream text-brand-text-muted hover:text-brand-forest"
+                        aria-label="Next testimonial"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-brand-text-muted italic leading-relaxed mb-2">
-                  "I love how the community makes use of this place. Step-free wheelchair access, warm rooms, helpful volunteers, and always something going on."
-                </p>
-                <span className="text-[11px] font-bold text-brand-forest">— Gordon Bushell, Local Hirer</span>
-              </div>
+              )}
             </div>
           </div>
         </div>
