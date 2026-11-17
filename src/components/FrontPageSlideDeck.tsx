@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play, ArrowRight, Camera } from 'lucide-react'
 import { SmartImage } from './SmartImage'
 import { TabId } from './Header'
@@ -27,20 +27,6 @@ export const FRONT_PAGE_SLIDES: SlideDeckItem[] = [
       'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Vix-Elizabeth-Photo-of-KEH.webp',
       'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Vix-Elizabeth-Photo-of-KEH.jpg',
       'https://www.kingedwardhall.org.uk/wp-content/uploads/elementor/thumbs/Vix-Elizabeth-Photo-of-KEH-rhcymtmv422rrqg3zp4r2cskd807jthhs96r8j594g.webp',
-      'images/newcombe-hall.jpg'
-    ]
-  },
-  {
-    id: 'newcombe-hall-stage',
-    title: 'Newcombe Hall & Proscenium Stage',
-    category: 'Premier Function Hall • 200 Seated',
-    caption: 'Our largest space (15.6m × 8.6m) with raised stage and PA induction loop — ideal for weddings, concerts, and charity functions.',
-    targetTab: 'room-newcombe',
-    ctaLabel: 'View Newcombe Hall',
-    urls: [
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.jpg',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
       'images/newcombe-hall.jpg'
     ]
   },
@@ -136,6 +122,8 @@ export const FRONT_PAGE_SLIDES: SlideDeckItem[] = [
   }
 ]
 
+const SLIDE_INTERVAL_MS = 4200
+
 interface FrontPageSlideDeckProps {
   setActiveTab: (tab: TabId) => void
 }
@@ -143,9 +131,10 @@ interface FrontPageSlideDeckProps {
 export const FrontPageSlideDeck: React.FC<FrontPageSlideDeckProps> = ({ setActiveTab }) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const thumbStripRef = useRef<HTMLDivElement>(null)
 
   const totalSlides = FRONT_PAGE_SLIDES.length
-  const currentSlide = FRONT_PAGE_SLIDES[activeIndex]
+  const currentSlide = FRONT_PAGE_SLIDES[activeIndex] || FRONT_PAGE_SLIDES[0]
 
   const goToNext = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % totalSlides)
@@ -155,33 +144,59 @@ export const FrontPageSlideDeck: React.FC<FrontPageSlideDeckProps> = ({ setActiv
     setActiveIndex((prev) => (prev - 1 + totalSlides) % totalSlides)
   }, [totalSlides])
 
+  // Continuously and slowly scroll through the slides automatically unless explicitly paused
   useEffect(() => {
     if (isPaused) return
-    const timer = window.setInterval(goToNext, 4800)
+    const timer = window.setInterval(goToNext, SLIDE_INTERVAL_MS)
     return () => window.clearInterval(timer)
   }, [isPaused, goToNext])
+
+  // Smoothly scroll the thumbnail strip horizontally to keep the active thumbnail centered
+  useEffect(() => {
+    const container = thumbStripRef.current
+    if (!container) return
+    const activeThumb = container.children[activeIndex] as HTMLElement | undefined
+    if (!activeThumb) return
+    const targetLeft =
+      activeThumb.offsetLeft - container.clientWidth / 2 + activeThumb.clientWidth / 2
+    container.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: 'smooth'
+    })
+  }, [activeIndex])
 
   return (
     <div
       className="rounded-2xl overflow-hidden bg-brand-forest-dark border border-brand-brass/35 shadow-elevated"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
       role="region"
       aria-roledescription="carousel"
       aria-label="King Edward Hall photo slide deck"
     >
-      {/* Main Slide Viewport */}
+      {/* Main Slide Viewport with Slow Horizontal Gliding Track */}
       <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden bg-brand-forest-dark">
-        <SmartImage
-          key={currentSlide.id}
-          urls={currentSlide.urls}
-          alt={currentSlide.title}
-          className="w-full h-full object-cover object-center transition-all duration-500 animate-in fade-in"
-          loading="eager"
-        />
+        <div
+          className="flex w-full h-full transition-transform duration-1000 ease-in-out"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+        >
+          {FRONT_PAGE_SLIDES.map((slide, idx) => {
+            const isCurrent = idx === activeIndex
+            return (
+              <div key={slide.id} className="w-full h-full shrink-0 relative overflow-hidden">
+                <SmartImage
+                  urls={slide.urls}
+                  alt={slide.title}
+                  className={`w-full h-full object-cover object-center transition-transform duration-[4500ms] ease-out ${
+                    isCurrent ? 'scale-105' : 'scale-100'
+                  }`}
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                />
+              </div>
+            )
+          })}
+        </div>
 
         {/* Subtle gradient overlay for readable heritage typography */}
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-forest-dark/95 via-brand-forest-dark/30 to-black/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-forest-dark/95 via-brand-forest-dark/30 to-black/20" />
 
         {/* Top Bar: Slide Counter & Auto-play Toggle */}
         <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
@@ -252,7 +267,10 @@ export const FrontPageSlideDeck: React.FC<FrontPageSlideDeckProps> = ({ setActiv
 
       {/* Interactive Thumbnail Strip & Slide Selector Bar */}
       <div className="bg-brand-forest-dark/95 border-t border-brand-forest-light/40 px-3 py-2.5">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+        <div
+          ref={thumbStripRef}
+          className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5 scroll-smooth"
+        >
           {FRONT_PAGE_SLIDES.map((slide, idx) => {
             const isActive = idx === activeIndex
             return (
@@ -262,7 +280,7 @@ export const FrontPageSlideDeck: React.FC<FrontPageSlideDeckProps> = ({ setActiv
                 onClick={() => setActiveIndex(idx)}
                 aria-label={`Show slide ${idx + 1}: ${slide.title}`}
                 aria-current={isActive ? 'true' : undefined}
-                className={`group relative shrink-0 w-16 sm:w-20 h-11 sm:h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                className={`group relative shrink-0 w-16 sm:w-20 h-11 sm:h-12 rounded-lg overflow-hidden border-2 transition-all duration-500 ${
                   isActive
                     ? 'border-brand-brass ring-2 ring-brand-brass/40 scale-[1.03]'
                     : 'border-transparent opacity-60 hover:opacity-95'
