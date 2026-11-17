@@ -1,67 +1,37 @@
 import React from 'react'
 
-export const KingEdwardCrest: React.FC<{ className?: string }> = ({ className = 'w-10 h-10' }) => (
-  <svg
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    aria-hidden="true"
+/**
+ * Signature "Lindfield's KING EDWARD HALL" brand mark inspired by the classic hall logo,
+ * rendered in the Sussex Heritage palette (Forest Green #1B382B, Warm Brass #C29B38, Alabaster Cream #FBF9F5)
+ * and editorial brand typography (Playfair Display & Plus Jakarta Sans).
+ */
+export const KingEdwardLogo: React.FC<{ variant?: 'header' | 'footer' }> = ({ variant = 'header' }) => (
+  <div
+    className={`relative inline-flex flex-col justify-between overflow-hidden rounded-lg bg-brand-forest text-white shadow-soft transition-transform group-hover:scale-[1.01] select-none ${
+      variant === 'header'
+        ? 'px-3.5 pt-2 pb-2.5 sm:px-4 sm:pt-2.5 sm:pb-3 border border-brand-forest-dark/15'
+        : 'px-4 pt-2.5 pb-3 border border-brand-brass/30'
+    }`}
   >
-    {/* Outer minimalist shield/badge frame */}
-    <rect
-      x="2"
-      y="2"
-      width="44"
-      height="44"
-      rx="10"
-      className="fill-brand-forest stroke-brand-brass/50"
-      strokeWidth="1.5"
-    />
-    {/* Subtle inner brass keyline */}
-    <rect
-      x="5"
-      y="5"
-      width="38"
-      height="38"
-      rx="7"
-      className="stroke-brand-brass/25"
-      strokeWidth="1"
-    />
-    {/* Edwardian 1911 Gable Roof */}
-    <path
-      d="M11 22L24 12L37 22"
-      className="stroke-brand-brass"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    {/* Gable finial & clock/rose window detail */}
-    <circle cx="24" cy="17.5" r="1.75" className="fill-brand-brass-light" />
-    {/* Columns & Archway */}
-    <path
-      d="M14 22V35M34 22V35"
-      className="stroke-brand-cream/90"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    <path
-      d="M20 35V27.5C20 25.2909 21.7909 23.5 24 23.5C26.2091 23.5 28 25.2909 28 27.5V35"
-      className="stroke-brand-brass-light"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    {/* Foundation Plinth */}
-    <line
-      x1="11"
-      y1="35"
-      x2="37"
-      y2="35"
-      className="stroke-brand-brass"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-    />
-  </svg>
+    {/* Slanted "Lindfield's" script/italic line arching over KING */}
+    <div className="relative h-3.5 sm:h-4">
+      <span
+        className="inline-block font-serif italic font-semibold text-brand-brass-light text-sm sm:text-base leading-none tracking-tight -rotate-[9deg] origin-bottom-left translate-y-0.5 drop-shadow-[0_1px_1px_rgba(17,37,28,0.8)]"
+      >
+        Lindfield’s
+      </span>
+    </div>
+
+    {/* Bold uppercase "KING EDWARD HALL" indented to sit beneath the arch of Lindfield's */}
+    <div className="pl-3 sm:pl-4 pt-0.5">
+      <span className="font-serif font-bold uppercase tracking-[0.08em] text-white text-xs sm:text-sm md:text-base leading-none block whitespace-nowrap">
+        KING EDWARD HALL
+      </span>
+    </div>
+
+    {/* Signature Warm Brass bottom accent bar */}
+    <div className="absolute inset-x-0 bottom-0 h-1 sm:h-1.5 bg-brand-brass" aria-hidden="true" />
+  </div>
 )
 
 export const PillarVenueIcon: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (

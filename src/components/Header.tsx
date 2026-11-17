@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Menu, X, Calendar, MapPin, ChevronDown, Sparkles, Heart } from 'lucide-react'
-import { KingEdwardCrest } from './BrandIcons'
+import { KingEdwardLogo } from './BrandIcons'
 
 export type TabId = 
   | 'home' 
@@ -118,20 +118,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           {/* Logo / Brand Mark */}
           <button 
             onClick={() => handleNav('home')} 
-            className="flex items-center gap-2.5 sm:gap-3 text-left group focus:outline-none"
-            aria-label="King Edward Hall Lindfield Home"
+            className="flex items-center text-left group focus:outline-none"
+            aria-label="Lindfield's King Edward Hall Home"
           >
-            <div className="shrink-0 rounded-xl shadow-soft transition-transform group-hover:scale-[1.02]">
-              <KingEdwardCrest className="w-10 h-10 sm:w-11 sm:h-11" />
-            </div>
-            <div>
-              <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-brand-forest-dark block leading-tight group-hover:text-brand-forest transition-colors">
-                King Edward Hall
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase text-brand-brass block">
-                Lindfield • Est. 1911
-              </span>
-            </div>
+            <KingEdwardLogo variant="header" />
           </button>
 
           {/* Desktop Navigation */}

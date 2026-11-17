@@ -1,6 +1,6 @@
 import { Heart, Mail, MapPin, ExternalLink, ShieldCheck } from 'lucide-react'
 import { TabId } from './Header'
-import { KingEdwardCrest } from './BrandIcons'
+import { KingEdwardLogo } from './BrandIcons'
 
 interface FooterProps {
   setActiveTab: (tab: TabId) => void
@@ -40,12 +40,8 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Col 1: About & Address */}
           <div>
-            <div className="flex items-center gap-2.5 mb-4">
-              <KingEdwardCrest className="w-9 h-9 shrink-0" />
-              <div>
-                <span className="font-serif text-xl font-bold text-white block leading-tight">King Edward Hall</span>
-                <span className="text-[10px] uppercase tracking-wider text-brand-brass font-semibold block">Lindfield • Est. 1911</span>
-              </div>
+            <div className="mb-4">
+              <KingEdwardLogo variant="footer" />
             </div>
             <p className="text-xs sm:text-sm text-brand-cream/70 mb-4 leading-relaxed">
               Situated in the heart of Lindfield, West Sussex, directly opposite the picturesque village duck pond. Dedicated to the memory of King Edward VII, 1911.
