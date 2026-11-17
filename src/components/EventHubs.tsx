@@ -464,34 +464,86 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            {/* Upcoming Film Cards */}
+            {/* Upcoming Film Cards (Clickable to select film) */}
             <div className="space-y-4">
-              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Upcoming Screenings</h3>
-
-              <div className="p-5 rounded-2xl border-2 border-brand-brass bg-brand-surface shadow-soft">
-                <span className="text-[11px] font-bold text-brand-forest uppercase tracking-wider block mb-1">
-                  Thursday 21st January 2027 • 7:30 PM
-                </span>
-                <h4 className="font-serif text-2xl font-bold text-brand-forest-dark mb-1">Sense and Sensibility</h4>
-                <span className="text-xs font-semibold text-brand-brass block mb-3">Genre: Period Drama • Certificate: U</span>
-                <p className="text-xs sm:text-sm text-brand-text-muted leading-relaxed mb-4">
-                  Emma Thompson and Kate Winslet star in Jane Austen’s classic tale of romance and social mores in idyllic English country estates.
-                </p>
-                <div className="text-xs text-emerald-700 font-semibold bg-emerald-50 p-2.5 rounded-xl">
-                  ✓ Online booking open • £9 per ticket
-                </div>
+              <div className="flex items-center justify-between">
+                <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Upcoming Screenings</h3>
+                <span className="text-xs text-brand-text-muted">Tap a film to select</span>
               </div>
 
-              <div className="p-5 rounded-2xl border border-brand-cream-dark bg-brand-surface shadow-soft">
-                <span className="text-[11px] font-bold text-brand-forest uppercase tracking-wider block mb-1">
-                  Thursday 19th November 2026 • 7:30 PM
-                </span>
-                <h4 className="font-serif text-xl font-bold text-brand-forest-dark mb-1">Pressure</h4>
-                <span className="text-xs font-semibold text-brand-brass block mb-3">Genre: Historical Drama • Certificate: 12A</span>
-                <p className="text-xs sm:text-sm text-brand-text-muted leading-relaxed">
-                  The gripping story of Group Captain James Stagg and the critical weather forecast that determined the fate of the D-Day landings.
-                </p>
-              </div>
+              {[
+                {
+                  id: 'Sense and Sensibility (21 Jan 2027)',
+                  dateLabel: 'Thursday 21st January 2027 • 7:30 PM',
+                  title: 'Sense and Sensibility',
+                  meta: 'Genre: Period Drama • Certificate: U',
+                  synopsis:
+                    'Emma Thompson and Kate Winslet star in Jane Austen’s classic tale of romance and social mores in idyllic English country estates.'
+                },
+                {
+                  id: 'Pressure (19 Nov 2026)',
+                  dateLabel: 'Thursday 19th November 2026 • 7:30 PM',
+                  title: 'Pressure',
+                  meta: 'Genre: Historical Drama • Certificate: 12A',
+                  synopsis:
+                    'The gripping story of Group Captain James Stagg and the critical weather forecast that determined the fate of the D-Day landings.'
+                }
+              ].map((film) => {
+                const isSelected = selectedFilm === film.id
+                return (
+                  <button
+                    key={film.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => {
+                      setSelectedFilm(film.id)
+                      setCinemaBooked(false)
+                    }}
+                    className={`w-full text-left p-5 rounded-2xl transition-all cursor-pointer block ${
+                      isSelected
+                        ? 'border-2 border-brand-brass bg-brand-surface shadow-elevated ring-2 ring-brand-brass/15'
+                        : 'border border-brand-cream-dark bg-brand-surface/80 hover:bg-brand-surface hover:border-brand-brass/50 shadow-soft'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <span className="text-[11px] font-bold text-brand-forest uppercase tracking-wider block">
+                        {film.dateLabel}
+                      </span>
+                      <span
+                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 transition-colors ${
+                          isSelected
+                            ? 'bg-brand-forest text-white'
+                            : 'bg-brand-cream text-brand-forest-dark'
+                        }`}
+                      >
+                        {isSelected ? 'Selected' : 'Select Film'}
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-xl sm:text-2xl font-bold text-brand-forest-dark mb-1">
+                      {film.title}
+                    </h4>
+                    <span className="text-xs font-semibold text-brand-brass block mb-3">
+                      {film.meta}
+                    </span>
+                    <p className="text-xs sm:text-sm text-brand-text-muted leading-relaxed mb-4">
+                      {film.synopsis}
+                    </p>
+                    <div
+                      className={`text-xs font-semibold p-2.5 rounded-xl flex items-center justify-between transition-colors ${
+                        isSelected
+                          ? 'text-emerald-800 bg-emerald-50 border border-emerald-200/60'
+                          : 'text-brand-forest bg-brand-cream/70'
+                      }`}
+                    >
+                      <span>
+                        {isSelected
+                          ? '✓ Selected for booking • £9 per ticket'
+                          : 'Click to book this screening • £9 per ticket'}
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
 
             {/* Instant Online Ticket Reservation Counter */}
