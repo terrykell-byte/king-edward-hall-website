@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Menu, X, Calendar, MapPin, ChevronDown, Sparkles } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Menu, X, Calendar, MapPin, ChevronDown, Sparkles, Heart } from 'lucide-react'
+import { KingEdwardCrest } from './BrandIcons'
 
 export type TabId = 
   | 'home' 
@@ -20,6 +21,26 @@ export type TabId =
   | 'faq' 
   | 'contact'
 
+export const ALL_TAB_IDS: readonly TabId[] = [
+  'home',
+  'room-hire',
+  'room-newcombe',
+  'room-jubilee',
+  'room-library',
+  'kitchens',
+  'calculator',
+  'events-home',
+  'event-village-day',
+  'event-village-run',
+  'event-film-nights',
+  'event-sponsors',
+  'about',
+  'history',
+  'donate',
+  'faq',
+  'contact'
+]
+
 interface HeaderProps {
   activeTab: TabId
   setActiveTab: (tab: TabId) => void
@@ -28,6 +49,22 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      document.body.style.overflow = ''
+      return
+    }
+    document.body.style.overflow = 'hidden'
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [mobileMenuOpen])
 
   const handleNav = (tab: TabId) => {
     setActiveTab(tab)
@@ -40,23 +77,34 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
   const isEventsActive = activeTab.startsWith('event')
   const isAboutActive = ['about', 'history', 'donate', 'faq', 'contact'].includes(activeTab)
 
+  const mobileButtonClass = (tab: TabId, highlightBrass = false) => {
+    const isCurrent = activeTab === tab
+    if (isCurrent) {
+      return 'bg-brand-forest text-white font-bold ring-1 ring-brand-brass shadow-soft'
+    }
+    if (highlightBrass) {
+      return 'bg-brand-brass/15 text-brand-forest-dark font-bold hover:bg-brand-brass/25 border border-brand-brass/30'
+    }
+    return 'bg-brand-cream/80 text-brand-text-dark font-medium hover:bg-brand-cream-dark'
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-brand-surface/95 backdrop-blur-md border-b border-brand-forest/10 transition-all">
-      {/* Top Utility Bar */}
-      <div className="bg-brand-forest text-brand-cream text-xs py-1.5 px-4 sm:px-8 border-b border-brand-forest-light">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-4">
+      {/* Top Utility Bar — Desktop/Tablet only to preserve compact 64px header on mobile */}
+      <div className="hidden md:block bg-brand-forest text-brand-cream text-xs py-1.5 px-4 sm:px-8 border-b border-brand-forest-light">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
           <div className="flex items-center gap-3 text-brand-brass-light">
-            <span className="flex items-center gap-1 font-medium">
+            <span className="flex items-center gap-1.5 font-medium">
               <MapPin className="w-3.5 h-3.5 text-brand-brass" /> 24 High Street, Lindfield, West Sussex RH16 2HH
             </span>
-            <span className="hidden md:inline text-brand-forest-light">•</span>
-            <span className="hidden md:inline">Registered Charity No. 249649</span>
+            <span className="text-brand-forest-light">•</span>
+            <span>Registered Charity No. 249649</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] font-medium text-brand-cream/80">
             <span>Opposite the Village Duck Pond</span>
             <button 
               onClick={() => handleNav('donate')}
-              className="text-brand-brass hover:text-white transition-colors underline underline-offset-2"
+              className="text-brand-brass-light hover:text-white transition-colors underline underline-offset-2 font-semibold"
             >
               Support Our Charity
             </button>
@@ -64,24 +112,24 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         </div>
       </div>
 
-      {/* Main Navbar */}
+      {/* Main Navbar (64px on mobile, 80px on desktop) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-16 sm:h-20">
           {/* Logo / Brand Mark */}
           <button 
             onClick={() => handleNav('home')} 
-            className="flex items-center gap-3 text-left group focus:outline-none"
+            className="flex items-center gap-2.5 sm:gap-3 text-left group focus:outline-none"
             aria-label="King Edward Hall Lindfield Home"
           >
-            <div className="w-11 h-11 rounded-lg bg-brand-forest text-brand-brass flex items-center justify-center font-serif text-2xl font-bold shadow-soft border border-brand-brass/30 group-hover:bg-brand-forest-light transition-colors">
-              🏛️
+            <div className="shrink-0 rounded-xl shadow-soft transition-transform group-hover:scale-[1.02]">
+              <KingEdwardCrest className="w-10 h-10 sm:w-11 sm:h-11" />
             </div>
             <div>
-              <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-brand-forest-dark block group-hover:text-brand-forest transition-colors">
+              <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-brand-forest-dark block leading-tight group-hover:text-brand-forest transition-colors">
                 King Edward Hall
               </span>
-              <span className="text-[11px] font-semibold tracking-wider uppercase text-brand-brass block">
-                Lindfield • Established 1911
+              <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase text-brand-brass block">
+                Lindfield • Est. 1911
               </span>
             </div>
           </button>
@@ -96,9 +144,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             >
               <button
                 onClick={() => handleNav('room-hire')}
-                className={`px-3 py-2 rounded-md text-sm font-semibold flex items-center gap-1.5 transition-colors ${
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors ${
                   isRoomActive 
-                    ? 'text-brand-forest bg-brand-forest/5' 
+                    ? 'text-brand-forest bg-brand-forest/8' 
                     : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                 }`}
                 aria-expanded={activeDropdown === 'rooms'}
@@ -145,9 +193,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             >
               <button
                 onClick={() => handleNav('events-home')}
-                className={`px-3 py-2 rounded-md text-sm font-semibold flex items-center gap-1.5 transition-colors ${
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors ${
                   isEventsActive 
-                    ? 'text-brand-forest bg-brand-forest/5' 
+                    ? 'text-brand-forest bg-brand-forest/8' 
                     : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                 }`}
                 aria-expanded={activeDropdown === 'events'}
@@ -190,9 +238,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             >
               <button
                 onClick={() => handleNav('about')}
-                className={`px-3 py-2 rounded-md text-sm font-semibold flex items-center gap-1.5 transition-colors ${
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors ${
                   isAboutActive 
-                    ? 'text-brand-forest bg-brand-forest/5' 
+                    ? 'text-brand-forest bg-brand-forest/8' 
                     : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                 }`}
                 aria-expanded={activeDropdown === 'about'}
@@ -226,20 +274,21 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           </nav>
 
           {/* Action Button & Mobile Menu Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => handleNav('calculator')}
-              className="inline-flex items-center gap-2 bg-brand-brass hover:bg-brand-brass-hover text-white px-4 sm:px-5 py-2.5 rounded-lg text-sm font-bold shadow-soft hover:shadow-elevated transition-all active:scale-[0.98]"
+              className="inline-flex items-center gap-2 bg-brand-brass hover:bg-brand-brass-hover text-white px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-soft hover:shadow-elevated transition-all active:scale-[0.98]"
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 shrink-0" />
               <span>Book a Room</span>
             </button>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Button (>= 44x44px touch target) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-lg text-brand-text-dark hover:bg-brand-cream-dark transition-colors"
+              className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-brand-forest-dark hover:bg-brand-cream-dark transition-colors"
               aria-label="Toggle mobile menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -247,57 +296,163 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         </div>
       </div>
 
-      {/* Mobile Slide-Over Menu */}
+      {/* Mobile Slide-Over Drawer with Backdrop Blur & Scroll Lock */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-brand-cream-dark bg-brand-surface px-4 py-6 space-y-6 animate-in slide-in-from-top-4 duration-200 shadow-elevated">
-          {/* Pillar 1 Mobile */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-forest mb-2">Room Hire & Facilities</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => handleNav('room-hire')} className="text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium hover:bg-brand-cream-dark">All Rooms Overview</button>
-              <button onClick={() => handleNav('calculator')} className="text-left p-2.5 rounded-md bg-brand-brass/15 text-brand-forest-dark text-sm font-bold hover:bg-brand-brass/25">Price Calculator</button>
-              <button onClick={() => handleNav('room-newcombe')} className="text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium hover:bg-brand-cream-dark">Newcombe Hall (200)</button>
-              <button onClick={() => handleNav('room-jubilee')} className="text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium hover:bg-brand-cream-dark">Jubilee Room (60)</button>
-              <button onClick={() => handleNav('room-library')} className="text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium hover:bg-brand-cream-dark">The Library (30)</button>
-              <button onClick={() => handleNav('kitchens')} className="text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium hover:bg-brand-cream-dark">Kitchen Catering</button>
+        <>
+          <div
+            className="fixed inset-0 top-16 sm:top-20 z-40 bg-brand-forest-dark/40 backdrop-blur-xs lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 z-50 border-t border-brand-cream-dark bg-brand-surface px-4 py-5 space-y-6 overflow-y-auto shadow-elevated animate-in slide-in-from-top-2 duration-200">
+            {/* Pillar 1 Mobile */}
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-brand-brass">
+                  01 • Room Hire & Facilities
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleNav('room-hire')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors flex items-center justify-between ${mobileButtonClass('room-hire')}`}
+                >
+                  <span>All Rooms & Rates</span>
+                </button>
+                <button
+                  onClick={() => handleNav('calculator')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors flex items-center gap-1.5 ${mobileButtonClass('calculator', true)}`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-brand-brass shrink-0" />
+                  <span>Price Calculator</span>
+                </button>
+                <button
+                  onClick={() => handleNav('room-newcombe')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('room-newcombe')}`}
+                >
+                  <span className="block">Newcombe Hall</span>
+                  <span className="text-[10px] opacity-75">Up to 200 guests</span>
+                </button>
+                <button
+                  onClick={() => handleNav('room-jubilee')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('room-jubilee')}`}
+                >
+                  <span className="block">Jubilee Room</span>
+                  <span className="text-[10px] opacity-75">Up to 60 guests</span>
+                </button>
+                <button
+                  onClick={() => handleNav('room-library')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('room-library')}`}
+                >
+                  <span className="block">The Library</span>
+                  <span className="text-[10px] opacity-75">Up to 30 guests</span>
+                </button>
+                <button
+                  onClick={() => handleNav('kitchens')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('kitchens')}`}
+                >
+                  <span className="block">Kitchen Catering</span>
+                  <span className="text-[10px] opacity-75">Main & Jubilee</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Pillar 2 Mobile */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-forest mb-2">Community Events</h3>
-            <div className="space-y-1.5">
-              <button onClick={() => handleNav('event-village-day')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
-                <span>Lindfield Village Day</span>
-                <span className="text-xs text-brand-brass font-bold">05/06/2027</span>
-              </button>
-              <button onClick={() => handleNav('event-village-run')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
-                <span>Lindfield Village Run 5K & 10K</span>
-                <span className="text-xs text-brand-brass font-bold">23/05/2027</span>
-              </button>
-              <button onClick={() => handleNav('event-film-nights')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
-                <span>Film Nights Cinema Tickets</span>
-                <span className="text-xs text-brand-forest font-bold">£9</span>
-              </button>
-              <button onClick={() => handleNav('event-sponsors')} className="w-full text-left p-2.5 rounded-md bg-brand-cream text-sm font-medium flex justify-between">
-                <span>Community Sponsors</span>
-                <span className="text-xs text-brand-brass font-bold">Partners</span>
-              </button>
+            {/* Pillar 2 Mobile */}
+            <div>
+              <h3 className="text-[11px] font-bold uppercase tracking-widest text-brand-brass mb-2.5">
+                02 • Community Events
+              </h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleNav('events-home')}
+                  className={`w-full min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-sm transition-colors flex justify-between items-center ${mobileButtonClass('events-home')}`}
+                >
+                  <span>All Community Events Overview</span>
+                  <span className="text-xs font-bold opacity-80">Hub →</span>
+                </button>
+                <button
+                  onClick={() => handleNav('event-village-day')}
+                  className={`w-full min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-sm transition-colors flex justify-between items-center ${mobileButtonClass('event-village-day')}`}
+                >
+                  <span>Lindfield Village Day</span>
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-brand-brass/20 text-brand-forest-dark font-bold">05/06/2027</span>
+                </button>
+                <button
+                  onClick={() => handleNav('event-village-run')}
+                  className={`w-full min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-sm transition-colors flex justify-between items-center ${mobileButtonClass('event-village-run')}`}
+                >
+                  <span>Lindfield Village Run 5K & 10K</span>
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-800 font-bold">23/05/2027</span>
+                </button>
+                <button
+                  onClick={() => handleNav('event-film-nights')}
+                  className={`w-full min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-sm transition-colors flex justify-between items-center ${mobileButtonClass('event-film-nights')}`}
+                >
+                  <span>Film Nights Cinema Tickets</span>
+                  <span className="text-[11px] font-bold opacity-90">£9.00</span>
+                </button>
+                <button
+                  onClick={() => handleNav('event-sponsors')}
+                  className={`w-full min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-sm transition-colors flex justify-between items-center ${mobileButtonClass('event-sponsors')}`}
+                >
+                  <span>Community Event Sponsors</span>
+                  <span className="text-[11px] font-semibold opacity-75">Partners</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Pillar 3 Mobile */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-forest mb-2">The Hall & Charity</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => handleNav('about')} className="text-left p-2 rounded-md text-sm hover:bg-brand-cream">About KEH</button>
-              <button onClick={() => handleNav('history')} className="text-left p-2 rounded-md text-sm hover:bg-brand-cream">1911 History</button>
-              <button onClick={() => handleNav('donate')} className="text-left p-2 rounded-md text-sm text-brand-brass font-bold hover:bg-brand-cream">Donate to Charity</button>
-              <button onClick={() => handleNav('faq')} className="text-left p-2 rounded-md text-sm hover:bg-brand-cream">Social Club FAQ</button>
-              <button onClick={() => handleNav('contact')} className="col-span-2 text-left p-2 rounded-md text-sm font-semibold text-brand-forest bg-brand-forest/5">Contact & Committee</button>
+            {/* Pillar 3 Mobile */}
+            <div>
+              <h3 className="text-[11px] font-bold uppercase tracking-widest text-brand-brass mb-2.5">
+                03 • The Hall & Charity
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleNav('about')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('about')}`}
+                >
+                  About KEH
+                </button>
+                <button
+                  onClick={() => handleNav('history')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('history')}`}
+                >
+                  1911 Heritage
+                </button>
+                <button
+                  onClick={() => handleNav('faq')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('faq')}`}
+                >
+                  Social Club FAQ
+                </button>
+                <button
+                  onClick={() => handleNav('contact')}
+                  className={`min-h-[48px] text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition-colors ${mobileButtonClass('contact')}`}
+                >
+                  Contact & Trustees
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Utility & Charity Footer inside Drawer */}
+            <div className="p-4 rounded-2xl bg-brand-forest text-brand-cream space-y-3">
+              <div className="flex items-start gap-2.5 text-xs">
+                <MapPin className="w-4 h-4 text-brand-brass shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-white block">24 High Street, Lindfield, RH16 2HH</span>
+                  <span className="text-brand-cream/75">Opposite the Village Duck Pond • Charity No. 249649</span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleNav('donate')}
+                className="w-full min-h-[48px] bg-brand-brass hover:bg-brand-brass-hover text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-soft transition-colors"
+              >
+                <Heart className="w-4 h-4 fill-white" />
+                <span>Support Our Charity (Gift Aid)</span>
+              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   )

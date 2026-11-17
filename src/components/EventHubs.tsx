@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { TabId } from './Header'
+import { SubNavPills, SubNavItem } from './SubNavPills'
 import { 
   Check, 
   Ticket, 
@@ -8,13 +9,25 @@ import {
   Clock, 
   UserPlus, 
   HeartHandshake, 
-  Send 
+  Send,
+  Store,
+  Award,
+  Flag,
+  Music
 } from 'lucide-react'
 
 interface EventHubsProps {
   currentEvent: 'all' | 'village-day' | 'village-run' | 'film-nights' | 'sponsors'
   setActiveTab: (tab: TabId) => void
 }
+
+const EVENT_SUB_NAV_ITEMS: SubNavItem<TabId>[] = [
+  { id: 'events-home', label: 'All Community Events' },
+  { id: 'event-village-day', label: 'Lindfield Village Day' },
+  { id: 'event-village-run', label: 'Village Run 5K & 10K' },
+  { id: 'event-film-nights', label: 'Film Nights Cinema' },
+  { id: 'event-sponsors', label: 'Community Sponsors' }
+]
 
 export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab }) => {
   // Cinema ticket booking state
@@ -47,68 +60,37 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
   const runDays = calculateDaysRemaining('2027-05-23T10:30:00')
   const dayDays = calculateDaysRemaining('2027-06-05T12:00:00')
 
+  const activeNavTab: TabId =
+    currentEvent === 'all'
+      ? 'events-home'
+      : (`event-${currentEvent}` as TabId)
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
-      {/* Navigation sub-tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-brand-cream-dark pb-4 mb-10">
-        <button
-          onClick={() => setActiveTab('events-home')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-            currentEvent === 'all' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
-          }`}
-        >
-          All Community Events
-        </button>
-        <button
-          onClick={() => setActiveTab('event-village-day')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-            currentEvent === 'village-day' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
-          }`}
-        >
-          Lindfield Village Day
-        </button>
-        <button
-          onClick={() => setActiveTab('event-village-run')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-            currentEvent === 'village-run' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
-          }`}
-        >
-          Village Run 5K & 10K
-        </button>
-        <button
-          onClick={() => setActiveTab('event-film-nights')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-            currentEvent === 'film-nights' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
-          }`}
-        >
-          Film Nights Cinema
-        </button>
-        <button
-          onClick={() => setActiveTab('event-sponsors')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-            currentEvent === 'sponsors' ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
-          }`}
-        >
-          Community Sponsors
-        </button>
-      </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
+      {/* Touch-friendly horizontal scroll-snap sub-navigation */}
+      <SubNavPills
+        items={EVENT_SUB_NAV_ITEMS}
+        activeId={activeNavTab}
+        onSelect={(tab) => setActiveTab(tab)}
+        ariaLabel="Community events navigation"
+      />
 
       {/* ALL EVENTS OVERVIEW */}
       {currentEvent === 'all' && (
         <div className="space-y-12 animate-in fade-in duration-200">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-brass block mb-2">
-              Volunteers & Community In Action
+              Volunteers &amp; Community In Action
             </span>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-brand-forest-dark mb-4">
-              Community Celebrations & Events
+              Community Celebrations &amp; Events
             </h1>
             <p className="text-sm sm:text-base text-brand-text-muted leading-relaxed">
               Every major village tradition in Lindfield connects back to King Edward Hall. Organised entirely by volunteers, funds raised during Village Day and the Village Run directly maintain our charitable trust.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Card 1: Village Day */}
             <div className="bg-brand-surface rounded-2xl p-6 border border-brand-forest/10 shadow-soft hover:shadow-elevated transition-all flex flex-col justify-between">
               <div>
@@ -123,15 +105,15 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Lindfield Village Day
                 </h3>
-                <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
+                <p className="text-xs sm:text-sm text-brand-text-muted mb-5 leading-relaxed">
                   Over 10,000 visitors, 150 stalls on Lindfield Common, children’s dog show, High Street carnival procession, and live music stage.
                 </p>
               </div>
               <button
                 onClick={() => setActiveTab('event-village-day')}
-                className="w-full bg-brand-forest text-white text-xs font-bold py-2.5 rounded-lg hover:bg-brand-forest-light transition-colors"
+                className="w-full min-h-[46px] bg-brand-forest text-white text-xs font-bold py-2.5 rounded-xl hover:bg-brand-forest-light transition-colors"
               >
-                View Village Day & Register Stall
+                View Village Day &amp; Register Stall
               </button>
             </div>
 
@@ -149,15 +131,15 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Lindfield Village Run
                 </h3>
-                <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
+                <p className="text-xs sm:text-sm text-brand-text-muted mb-5 leading-relaxed">
                   Scenic 5K and 10K rural trail courses starting at Hickmans Lane Recreation Ground. Electronic chip timing and commemorative medals for all runners.
                 </p>
               </div>
               <button
                 onClick={() => setActiveTab('event-village-run')}
-                className="w-full bg-brand-forest text-white text-xs font-bold py-2.5 rounded-lg hover:bg-brand-forest-light transition-colors"
+                className="w-full min-h-[46px] bg-brand-forest text-white text-xs font-bold py-2.5 rounded-xl hover:bg-brand-forest-light transition-colors"
               >
-                View Race Guide & Enter Run
+                View Race Guide &amp; Enter Run
               </button>
             </div>
 
@@ -172,13 +154,13 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                 <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
                   Film Nights Cinema
                 </h3>
-                <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
+                <p className="text-xs sm:text-sm text-brand-text-muted mb-5 leading-relaxed">
                   Blockbuster screenings in the comfort of Newcombe Hall with surround audio, cinema screen, tea, coffee, and homemade cakes.
                 </p>
               </div>
               <button
                 onClick={() => setActiveTab('event-film-nights')}
-                className="w-full bg-brand-forest text-white text-xs font-bold py-2.5 rounded-lg hover:bg-brand-forest-light transition-colors"
+                className="w-full min-h-[46px] bg-brand-forest text-white text-xs font-bold py-2.5 rounded-xl hover:bg-brand-forest-light transition-colors"
               >
                 Book Film Tickets (£9)
               </button>
@@ -190,52 +172,60 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {/* VILLAGE DAY HUB */}
       {currentEvent === 'village-day' && (
         <div className="space-y-10 animate-in fade-in duration-200">
-          <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-brand-forest to-brand-forest-dark text-brand-cream relative overflow-hidden shadow-elevated">
-            <div className="flex flex-wrap items-center gap-3 mb-3">
-              <span className="px-3 py-1 rounded-full bg-brand-brass text-brand-forest-dark text-xs font-bold uppercase">
+          <div className="p-6 sm:p-12 rounded-2xl bg-gradient-to-br from-brand-forest to-brand-forest-dark text-brand-cream relative overflow-hidden shadow-elevated border border-brand-brass/30">
+            <div className="flex flex-wrap items-center gap-2.5 mb-3">
+              <span className="px-3 py-1 rounded-full bg-brand-brass text-white text-xs font-bold uppercase">
                 Save the Date • 05/06/2027
               </span>
               <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> Countdown: {dayDays} Days Until Village Day
+                <Clock className="w-3.5 h-3.5 text-brand-brass-light" /> Countdown: {dayDays} Days Until Village Day
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
               Lindfield Village Day 2027
             </h1>
-            <p className="text-brand-cream/80 text-sm sm:text-base max-w-2xl leading-relaxed mb-6">
+            <p className="text-brand-cream/85 text-sm sm:text-base max-w-2xl leading-relaxed mb-6">
               Celebrating its 49th year, Village Day is Mid Sussex’s most celebrated traditional community festival. Hundreds of villagers parade down Lindfield High Street to the Common for a full afternoon of arena entertainment, food quarters, and over 150 local artisan stalls.
             </p>
-            <div className="flex flex-wrap gap-4 text-xs font-semibold">
-              <span className="bg-white/10 px-3 py-1.5 rounded-md">🎪 150+ Stalls on Lindfield Common</span>
-              <span className="bg-white/10 px-3 py-1.5 rounded-md">🐕 Children’s Dog Show</span>
-              <span className="bg-white/10 px-3 py-1.5 rounded-md">🎺 High Street Carnival Procession</span>
-              <span className="bg-white/10 px-3 py-1.5 rounded-md">🎸 Live Music & Beer Tent</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2.5 text-xs font-semibold">
+              <span className="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2">
+                <Store className="w-4 h-4 text-brand-brass-light shrink-0" /> 150+ Stalls on Lindfield Common
+              </span>
+              <span className="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2">
+                <Award className="w-4 h-4 text-brand-brass-light shrink-0" /> Children’s Dog Show
+              </span>
+              <span className="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2">
+                <Flag className="w-4 h-4 text-brand-brass-light shrink-0" /> High Street Carnival Procession
+              </span>
+              <span className="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2">
+                <Music className="w-4 h-4 text-brand-brass-light shrink-0" /> Live Music &amp; Sussex Food Quarter
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Event Schedule */}
-            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 space-y-4">
-              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Schedule & Locations</h3>
+            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 shadow-soft space-y-4">
+              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Schedule &amp; Locations</h3>
               <div className="space-y-3 text-xs text-brand-text-muted">
-                <div className="flex gap-4 p-3 bg-brand-cream rounded-lg">
-                  <span className="font-bold text-brand-forest text-sm">12:00 PM</span>
+                <div className="flex gap-4 p-3.5 bg-brand-cream rounded-xl">
+                  <span className="font-bold text-brand-forest text-sm shrink-0">12:00 PM</span>
                   <div>
                     <strong className="text-brand-forest-dark block">Grand High Street Procession</strong>
                     Parade departs from the top of High Street down past the duck pond to Lindfield Common.
                   </div>
                 </div>
-                <div className="flex gap-4 p-3 bg-brand-cream rounded-lg">
-                  <span className="font-bold text-brand-forest text-sm">1:00 PM</span>
+                <div className="flex gap-4 p-3.5 bg-brand-cream rounded-xl">
+                  <span className="font-bold text-brand-forest text-sm shrink-0">1:00 PM</span>
                   <div>
-                    <strong className="text-brand-forest-dark block">Arena Entertainment & Dog Show</strong>
+                    <strong className="text-brand-forest-dark block">Arena Entertainment &amp; Dog Show</strong>
                     Main arena displays, children’s competition tent, and food quarter open.
                   </div>
                 </div>
-                <div className="flex gap-4 p-3 bg-brand-cream rounded-lg">
-                  <span className="font-bold text-brand-forest text-sm">5:00 PM</span>
+                <div className="flex gap-4 p-3.5 bg-brand-cream rounded-xl">
+                  <span className="font-bold text-brand-forest text-sm shrink-0">5:00 PM</span>
                   <div>
-                    <strong className="text-brand-forest-dark block">Stalls Close & Live Hub Evening</strong>
+                    <strong className="text-brand-forest-dark block">Stalls Close &amp; Live Hub Evening</strong>
                     Stalls wrap up while the Live Hub stage continues with evening bands and local Sussex food until 6:30 PM.
                   </div>
                 </div>
@@ -250,19 +240,19 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               <h3 className="font-serif text-xl font-bold text-brand-forest-dark mb-2">
                 Register Your Stall Interest
               </h3>
-              <p className="text-xs text-brand-text-muted mb-4">
+              <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
                 Village Day stalls are strictly limited to 150 pitches and sell out within days of opening. Register below to be notified first.
               </p>
 
               {stallSubmitted ? (
-                <div className="p-4 bg-emerald-50 text-emerald-800 rounded-lg text-xs flex items-center gap-2">
+                <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Thank you! Your stall interest for <strong>{stallName}</strong> has been received.</span>
                 </div>
               ) : (
                 <form 
                   onSubmit={(e) => { e.preventDefault(); setStallSubmitted(true) }} 
-                  className="space-y-3"
+                  className="space-y-3.5"
                 >
                   <div>
                     <label className="block text-xs font-semibold text-brand-text-dark mb-1">Business / Charity Name</label>
@@ -271,7 +261,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                       value={stallName} 
                       onChange={(e) => setStallName(e.target.value)} 
                       placeholder="e.g. Lindfield Honey & Crafts" 
-                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      className="w-full min-h-[44px] text-xs sm:text-sm p-2.5 border border-brand-forest/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-brass"
                       required
                     />
                   </div>
@@ -280,9 +270,9 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                     <select 
                       value={stallCategory} 
                       onChange={(e) => setStallCategory(e.target.value)}
-                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      className="w-full min-h-[44px] text-xs sm:text-sm p-2.5 border border-brand-forest/20 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-brass"
                     >
-                      <option value="crafts">Handmade Crafts & Gifts</option>
+                      <option value="crafts">Handmade Crafts &amp; Gifts</option>
                       <option value="food">Local Artisan Food / Produce</option>
                       <option value="charity">Registered Local Charity</option>
                       <option value="commercial">Commercial / Retail Service</option>
@@ -290,7 +280,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-brand-brass hover:bg-brand-brass-hover text-white py-2.5 rounded-lg text-xs font-bold transition-colors"
+                    className="w-full min-h-[48px] bg-brand-brass hover:bg-brand-brass-hover text-white py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-soft"
                   >
                     Submit Stall Notification Request
                   </button>
@@ -304,8 +294,8 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {/* VILLAGE RUN HUB */}
       {currentEvent === 'village-run' && (
         <div className="space-y-10 animate-in fade-in duration-200">
-          <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-emerald-900 to-brand-forest-dark text-white relative shadow-elevated">
-            <div className="flex flex-wrap items-center gap-3 mb-3">
+          <div className="p-6 sm:p-12 rounded-2xl bg-gradient-to-br from-emerald-900 to-brand-forest-dark text-white relative shadow-elevated border border-brand-brass/30">
+            <div className="flex flex-wrap items-center gap-2.5 mb-3">
               <span className="px-3 py-1 rounded-full bg-emerald-400 text-emerald-950 text-xs font-bold uppercase">
                 Sunday 23/05/2027 • Chip Timed
               </span>
@@ -314,25 +304,25 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
-              Lindfield Village Run 5K & 10K
+              Lindfield Village Run 5K &amp; 10K
             </h1>
-            <p className="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed mb-6">
+            <p className="text-white/85 text-sm sm:text-base max-w-2xl leading-relaxed mb-6">
               A classic Sussex cross-country challenge through undulating pastures, woodlands, and countryside trails around Lindfield. 100% of proceeds support the King Edward Hall trust.
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-              <div className="bg-white/10 p-3 rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-center">
+              <div className="bg-white/10 border border-white/15 p-3 rounded-xl">
                 <span className="text-xs text-white/70 block">5K Start Time</span>
                 <span className="font-bold text-lg">10:45 AM</span>
               </div>
-              <div className="bg-white/10 p-3 rounded-lg">
+              <div className="bg-white/10 border border-white/15 p-3 rounded-xl">
                 <span className="text-xs text-white/70 block">10K Start Time</span>
                 <span className="font-bold text-lg">10:30 AM</span>
               </div>
-              <div className="bg-white/10 p-3 rounded-lg">
+              <div className="bg-white/10 border border-white/15 p-3 rounded-xl">
                 <span className="text-xs text-white/70 block">5K Entry</span>
                 <span className="font-bold text-lg">£10.00</span>
               </div>
-              <div className="bg-white/10 p-3 rounded-lg">
+              <div className="bg-white/10 border border-white/15 p-3 rounded-xl">
                 <span className="text-xs text-white/70 block">10K Entry</span>
                 <span className="font-bold text-lg">£20.00</span>
               </div>
@@ -345,7 +335,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               <div className="flex items-center gap-2 text-brand-forest font-serif font-bold text-xl mb-1">
                 <UserPlus className="w-5 h-5 text-brand-brass" /> Runner Pre-Registration
               </div>
-              <p className="text-xs text-brand-text-muted mb-4">
+              <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
                 Both 5K and 10K entries sold out early in 2026. Pre-register your spot to guarantee your timing chip and commemorative medal.
               </p>
 
@@ -372,7 +362,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                       value={runnerName} 
                       onChange={(e) => setRunnerName(e.target.value)} 
                       placeholder="e.g. David Thompson"
-                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      className="w-full min-h-[44px] text-xs sm:text-sm p-2.5 border border-brand-forest/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-brass"
                       required
                     />
                   </div>
@@ -383,7 +373,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                       value={runnerEmail} 
                       onChange={(e) => setRunnerEmail(e.target.value)} 
                       placeholder="david@example.com"
-                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      className="w-full min-h-[44px] text-xs sm:text-sm p-2.5 border border-brand-forest/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-brass"
                       required
                     />
                   </div>
@@ -393,7 +383,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                       <button
                         type="button"
                         onClick={() => setRunnerRace('5k')}
-                        className={`p-3 rounded-lg text-xs font-bold border transition-colors ${
+                        className={`min-h-[46px] p-3 rounded-xl text-xs font-bold border transition-colors ${
                           runnerRace === '5k' ? 'bg-brand-forest text-white border-brand-forest' : 'bg-brand-cream border-brand-cream-dark'
                         }`}
                       >
@@ -402,7 +392,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                       <button
                         type="button"
                         onClick={() => setRunnerRace('10k')}
-                        className={`p-3 rounded-lg text-xs font-bold border transition-colors ${
+                        className={`min-h-[46px] p-3 rounded-xl text-xs font-bold border transition-colors ${
                           runnerRace === '10k' ? 'bg-brand-forest text-white border-brand-forest' : 'bg-brand-cream border-brand-cream-dark'
                         }`}
                       >
@@ -412,7 +402,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-brand-forest hover:bg-brand-forest-light text-white py-3 rounded-lg text-xs font-bold transition-colors shadow-soft"
+                    className="w-full min-h-[48px] bg-brand-forest hover:bg-brand-forest-light text-white py-3 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-soft"
                   >
                     Submit Race Entry Request
                   </button>
@@ -421,10 +411,10 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             </div>
 
             {/* Race Day Accordion FAQs */}
-            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 space-y-4">
-              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Runner Information & FAQs</h3>
+            <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 shadow-soft space-y-4">
+              <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Runner Information &amp; FAQs</h3>
               
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {[
                   { q: "Where does the race start and finish?", a: "The race starts and finishes at Hickmans Lane Recreation Ground in Lindfield, where bag drop tents, refreshments, and first aid are stationed." },
                   { q: "What is the trail terrain like?", a: "Both the 5K and 10K are true rural cross-country routes involving uneven grass, stile crossings, step climbs, and occasional muddy sections depending on weather." },
@@ -436,13 +426,13 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                     <div key={index} className="border border-brand-cream-dark rounded-xl overflow-hidden">
                       <button
                         onClick={() => setOpenFaq(isOpen ? null : index)}
-                        className="w-full text-left p-4 text-xs sm:text-sm font-semibold flex justify-between items-center bg-brand-cream hover:bg-brand-cream-dark transition-colors"
+                        className="w-full min-h-[48px] text-left p-4 text-xs sm:text-sm font-semibold flex justify-between items-center gap-3 bg-brand-cream hover:bg-brand-cream-dark transition-colors"
                       >
                         <span>{faq.q}</span>
-                        {isOpen ? <ChevronUp className="w-4 h-4 text-brand-forest" /> : <ChevronDown className="w-4 h-4 text-brand-text-muted" />}
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-brand-forest shrink-0" /> : <ChevronDown className="w-4 h-4 text-brand-text-muted shrink-0" />}
                       </button>
                       {isOpen && (
-                        <div className="p-4 text-xs text-brand-text-muted bg-white border-t border-brand-cream-dark leading-relaxed">
+                        <div className="p-4 text-xs sm:text-sm text-brand-text-muted bg-white border-t border-brand-cream-dark leading-relaxed">
                           {faq.a}
                         </div>
                       )}
@@ -458,18 +448,18 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {/* FILM NIGHTS HUB */}
       {currentEvent === 'film-nights' && (
         <div className="space-y-10 animate-in fade-in duration-200">
-          <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-purple-900 to-brand-forest-dark text-white relative shadow-elevated">
+          <div className="p-6 sm:p-12 rounded-2xl bg-gradient-to-br from-purple-900 to-brand-forest-dark text-white relative shadow-elevated border border-brand-brass/30">
             <span className="px-3 py-1 rounded-full bg-purple-300 text-purple-950 text-xs font-bold uppercase mb-3 inline-block">
               Village Cinema Experience
             </span>
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
               Film Nights at King Edward Hall
             </h1>
-            <p className="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed mb-4">
+            <p className="text-white/85 text-sm sm:text-base max-w-2xl leading-relaxed mb-4">
               Enjoy celebrated movies in the comfort of Newcombe Hall with your fellow Lindfield residents. Screenings feature high-definition projection, full hall surround audio, comfortable tiered seating, and intermission refreshments.
             </p>
-            <div className="text-xs text-brand-brass-light font-bold">
-              Tickets: £9.00 per person • Tea, coffee & homemade cakes available
+            <div className="text-xs sm:text-sm text-brand-brass-light font-bold">
+              Tickets: £9.00 per person • Tea, coffee &amp; homemade cakes available
             </div>
           </div>
 
@@ -478,27 +468,27 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             <div className="space-y-4">
               <h3 className="font-serif text-xl font-bold text-brand-forest-dark">Upcoming Screenings</h3>
 
-              <div className="p-5 rounded-xl border-2 border-brand-brass bg-brand-surface shadow-soft">
+              <div className="p-5 rounded-2xl border-2 border-brand-brass bg-brand-surface shadow-soft">
                 <span className="text-[11px] font-bold text-brand-forest uppercase tracking-wider block mb-1">
                   Thursday 21st January 2027 • 7:30 PM
                 </span>
                 <h4 className="font-serif text-2xl font-bold text-brand-forest-dark mb-1">Sense and Sensibility</h4>
                 <span className="text-xs font-semibold text-brand-brass block mb-3">Genre: Period Drama • Certificate: U</span>
-                <p className="text-xs text-brand-text-muted leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-brand-text-muted leading-relaxed mb-4">
                   Emma Thompson and Kate Winslet star in Jane Austen’s classic tale of romance and social mores in idyllic English country estates.
                 </p>
-                <div className="text-xs text-emerald-700 font-semibold bg-emerald-50 p-2 rounded-md">
-                  ✓ Online booking currently open • £9 per ticket
+                <div className="text-xs text-emerald-700 font-semibold bg-emerald-50 p-2.5 rounded-xl">
+                  ✓ Online booking open • £9 per ticket
                 </div>
               </div>
 
-              <div className="p-5 rounded-xl border border-brand-cream-dark bg-brand-cream">
-                <span className="text-[11px] font-bold text-brand-text-muted uppercase tracking-wider block mb-1">
+              <div className="p-5 rounded-2xl border border-brand-cream-dark bg-brand-surface shadow-soft">
+                <span className="text-[11px] font-bold text-brand-forest uppercase tracking-wider block mb-1">
                   Thursday 19th November 2026 • 7:30 PM
                 </span>
                 <h4 className="font-serif text-xl font-bold text-brand-forest-dark mb-1">Pressure</h4>
-                <span className="text-xs font-semibold text-brand-text-muted block mb-3">Genre: Historical Drama • Certificate: 12A</span>
-                <p className="text-xs text-brand-text-muted leading-relaxed">
+                <span className="text-xs font-semibold text-brand-brass block mb-3">Genre: Historical Drama • Certificate: 12A</span>
+                <p className="text-xs sm:text-sm text-brand-text-muted leading-relaxed">
                   The gripping story of Group Captain James Stagg and the critical weather forecast that determined the fate of the D-Day landings.
                 </p>
               </div>
@@ -507,7 +497,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             {/* Instant Online Ticket Reservation Counter */}
             <div className="p-6 bg-brand-surface rounded-2xl border border-brand-forest/10 shadow-soft">
               <h3 className="font-serif text-xl font-bold text-brand-forest-dark mb-2">Book Advanced Tickets</h3>
-              <p className="text-xs text-brand-text-muted mb-4">
+              <p className="text-xs text-brand-text-muted mb-4 leading-relaxed">
                 Secure your seats online without transaction fees. Tickets will be held under your name for collection on the door.
               </p>
 
@@ -532,7 +522,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                     <select
                       value={selectedFilm}
                       onChange={(e) => setSelectedFilm(e.target.value)}
-                      className="w-full text-xs p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-brass"
+                      className="w-full min-h-[44px] text-xs sm:text-sm p-2.5 border border-brand-forest/20 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-brass"
                     >
                       <option value="Sense and Sensibility (21 Jan 2027)">Sense and Sensibility (21 Jan 2027)</option>
                       <option value="Pressure (19 Nov 2026)">Pressure (19 Nov 2026)</option>
@@ -540,15 +530,15 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-brand-text-dark mb-1">Number of Tickets</label>
-                    <div className="flex items-center gap-3">
+                    <label className="block text-xs font-semibold text-brand-text-dark mb-1.5">Number of Tickets</label>
+                    <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 6].map((num) => (
                         <button
                           key={num}
                           type="button"
                           onClick={() => setFilmTickets(num)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                            filmTickets === num ? 'bg-brand-forest text-white' : 'bg-brand-cream hover:bg-brand-cream-dark'
+                          className={`min-h-[42px] rounded-xl text-xs font-bold transition-colors ${
+                            filmTickets === num ? 'bg-brand-forest text-white shadow-soft' : 'bg-brand-cream hover:bg-brand-cream-dark text-brand-forest-dark'
                           }`}
                         >
                           {num}
@@ -557,14 +547,14 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
                     </div>
                   </div>
 
-                  <div className="p-3 bg-brand-cream rounded-lg flex justify-between items-center text-xs">
+                  <div className="p-3.5 bg-brand-cream rounded-xl flex justify-between items-center text-xs">
                     <span className="text-brand-text-muted">Total Due (£9 × {filmTickets}):</span>
                     <span className="font-serif text-lg font-bold text-brand-forest-dark">£{filmTickets * 9}.00</span>
                   </div>
 
                   <button
                     onClick={() => setCinemaBooked(true)}
-                    className="w-full bg-brand-brass hover:bg-brand-brass-hover text-white py-3 rounded-lg text-xs font-bold transition-colors shadow-soft"
+                    className="w-full min-h-[48px] bg-brand-brass hover:bg-brand-brass-hover text-white py-3 rounded-xl text-xs sm:text-sm font-bold transition-colors shadow-soft"
                   >
                     Confirm Ticket Reservation
                   </button>
@@ -590,7 +580,7 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
               { name: 'Hamptons Estate Agents', category: 'Headline Village Day Sponsor' },
               { name: 'RTFJ Fine Jewellery', category: 'Major Village Run Sponsor' },
@@ -601,22 +591,22 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               { name: 'Oathall Veterinary Group', category: 'Children’s Dog Show Sponsor' },
               { name: 'Lindfield Parish Council', category: 'Civic Grant Partner' }
             ].map((sponsor, i) => (
-              <div key={i} className="bg-brand-surface p-6 rounded-2xl border border-brand-forest/10 shadow-soft text-center flex flex-col justify-center">
-                <HeartHandshake className="w-8 h-8 text-brand-brass mx-auto mb-3" />
-                <h4 className="font-serif text-base font-bold text-brand-forest-dark mb-1">{sponsor.name}</h4>
+              <div key={i} className="bg-brand-surface p-5 sm:p-6 rounded-2xl border border-brand-forest/10 shadow-soft text-center flex flex-col justify-center">
+                <HeartHandshake className="w-7 h-7 sm:w-8 sm:h-8 text-brand-brass mx-auto mb-3" />
+                <h4 className="font-serif text-sm sm:text-base font-bold text-brand-forest-dark mb-1">{sponsor.name}</h4>
                 <span className="text-[11px] text-brand-text-muted">{sponsor.category}</span>
               </div>
             ))}
           </div>
 
-          <div className="p-8 rounded-2xl bg-brand-cream border border-brand-cream-dark text-center max-w-2xl mx-auto space-y-3">
+          <div className="p-6 sm:p-8 rounded-2xl bg-brand-cream border border-brand-cream-dark text-center max-w-2xl mx-auto space-y-3">
             <h4 className="font-serif text-xl font-bold text-brand-forest-dark">Become a 2027 Event Sponsor</h4>
-            <p className="text-xs text-brand-text-muted">
+            <p className="text-xs sm:text-sm text-brand-text-muted">
               Connect your business with over 10,000 local Sussex residents while directly funding the preservation of King Edward Hall.
             </p>
             <a 
               href="mailto:villageday@kingedwardhall.org.uk?subject=2027%20Sponsorship%20Inquiry"
-              className="inline-flex items-center gap-2 bg-brand-forest text-white px-5 py-2.5 rounded-lg text-xs font-bold hover:bg-brand-forest-light transition-colors"
+              className="min-h-[46px] inline-flex items-center justify-center gap-2 bg-brand-forest text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
             >
               <Send className="w-3.5 h-3.5" /> Inquire About Business Sponsorship
             </a>

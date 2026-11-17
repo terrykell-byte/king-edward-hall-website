@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { calculateHireQuote, generateInquiryMailto, ROOM_RATES, KITCHEN_RATES, EQUIPMENT_RATES } from '../pricing'
+import {
+  calculateHireQuote,
+  generateInquiryMailto,
+  formatInquiryPlainText,
+  ROOM_RATES,
+  KITCHEN_RATES,
+  EQUIPMENT_RATES
+} from '../pricing'
 
 describe('calculateHireQuote', () => {
   it('calculates weekday off-peak quote for Newcombe Hall accurately', () => {
@@ -108,7 +115,7 @@ describe('calculateHireQuote', () => {
     )
   })
 
-  it('generates structured mailto URI avoiding feature envy', () => {
+  it('generates structured mailto URI and plain text inquiry summary avoiding feature envy', () => {
     const quote = calculateHireQuote({
       roomId: 'newcombe',
       date: '2026-11-21',
@@ -118,23 +125,31 @@ describe('calculateHireQuote', () => {
       guestCount: 100
     })
 
-    const mailto = generateInquiryMailto(quote, {
+    const contact = {
       name: 'John Doe',
       email: 'john@example.com',
       phone: '07700900000',
       eventDescription: 'Wedding Anniversary',
       date: '2026-11-21',
       startTime: '18:00'
-    })
+    }
 
+    const plainText = formatInquiryPlainText(quote, contact)
+    expect(plainText).toContain('Room: Newcombe Hall')
+    expect(plainText).toContain('Estimated Total Hire: £177')
+    expect(plainText).toContain('Name: John Doe')
+
+    const mailto = generateInquiryMailto(quote, contact)
     expect(mailto).toContain('mailto:roomhire@kingedwardhall.org.uk')
     expect(mailto).toContain('John%20Doe')
     expect(mailto).toContain('Newcombe%20Hall')
   })
 
-  it('exposes defined rates configuration correctly', () => {
+  it('exposes defined rates, seating layouts, and visual asset paths', () => {
     expect(ROOM_RATES.newcombe.name).toBe('Newcombe Hall')
     expect(ROOM_RATES.newcombe.maxCapacity).toBe(200)
+    expect(ROOM_RATES.newcombe.seatingLayouts.length).toBeGreaterThanOrEqual(3)
+    expect(ROOM_RATES.newcombe.imagePath).toBe('images/newcombe-hall.jpg')
     expect(KITCHEN_RATES.main_kitchen.flatRate).toBe(25)
     expect(KITCHEN_RATES.jubilee_kitchen.name).toBe('Jubilee Kitchen')
     expect(EQUIPMENT_RATES.pa_system.flatRate).toBe(20)

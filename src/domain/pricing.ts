@@ -1,6 +1,14 @@
 export type RoomId = 'newcombe' | 'jubilee' | 'library'
 export type KitchenId = 'main_kitchen' | 'jubilee_kitchen' | 'none'
 export type EquipmentId = 'pa_system' | 'projector'
+export type SeatingLayoutId = 'banquet' | 'theatre' | 'boardroom'
+
+export interface SeatingLayoutConfig {
+  id: SeatingLayoutId
+  label: string
+  capacity: number
+  description: string
+}
 
 export interface RoomRateConfig {
   id: RoomId
@@ -8,9 +16,12 @@ export interface RoomRateConfig {
   weekdayRate: number
   weekendRate: number
   maxCapacity: number
+  diningCapacity: number
   dimensions: string
   description: string
   features: string[]
+  imagePath: string
+  seatingLayouts: SeatingLayoutConfig[]
 }
 
 export interface KitchenRateConfig {
@@ -34,9 +45,31 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     weekdayRate: 28,
     weekendRate: 38,
     maxCapacity: 200,
+    diningCapacity: 100,
     dimensions: '15.6m × 8.6m',
     description: 'Largest hall space, ideal for wedding receptions, concerts, parties & exhibitions. Includes stage and PA system with induction loop.',
-    features: ['Raised Proscenium Stage', 'PA Induction Hearing Loop', 'Dimmable Lighting', 'Level Access']
+    features: ['Raised Proscenium Stage', 'PA Induction Hearing Loop', 'Dimmable Lighting', 'Level Access'],
+    imagePath: 'images/newcombe-hall.jpg',
+    seatingLayouts: [
+      {
+        id: 'theatre',
+        label: 'Theatre / Concert',
+        capacity: 200,
+        description: 'Tiered row seating facing the raised proscenium stage with central aisle and full hearing loop coverage.'
+      },
+      {
+        id: 'banquet',
+        label: 'Wedding / Banquet',
+        capacity: 100,
+        description: '10 round or trestle dining tables with dancefloor space in front of the stage and direct Main Kitchen service.'
+      },
+      {
+        id: 'boardroom',
+        label: 'Exhibition / Fair',
+        capacity: 150,
+        description: 'Perimeter trestle tables and open central promenade ideal for craft fairs, art exhibitions, and society events.'
+      }
+    ]
   },
   jubilee: {
     id: 'jubilee',
@@ -44,9 +77,31 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     weekdayRate: 18,
     weekendRate: 24,
     maxCapacity: 60,
+    diningCapacity: 40,
     dimensions: '9.2m × 6.1m',
     description: 'Medium hall popular for children’s birthday parties, fitness classes, and family gatherings with direct kitchen access.',
-    features: ['Direct Kitchen Hatch', 'Sprung Floor', 'Garden View Windows', 'Wheelchair Ramp']
+    features: ['Direct Kitchen Hatch', 'Sprung Floor', 'Garden View Windows', 'Wheelchair Ramp'],
+    imagePath: 'images/jubilee-room.jpg',
+    seatingLayouts: [
+      {
+        id: 'theatre',
+        label: 'Seated Presentation',
+        capacity: 60,
+        description: 'Row seating for society talks, AGMs, and community presentations with natural daylight.'
+      },
+      {
+        id: 'banquet',
+        label: 'Party / Dining Tables',
+        capacity: 40,
+        description: 'Arranged with dining tables and open play/gathering area beside the Jubilee Kitchen serving hatch.'
+      },
+      {
+        id: 'boardroom',
+        label: 'Fitness / Workshop',
+        capacity: 30,
+        description: 'Clear sprung timber floor space for yoga, pilates, dance classes, or easel art sessions.'
+      }
+    ]
   },
   library: {
     id: 'library',
@@ -54,9 +109,31 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     weekdayRate: 14,
     weekendRate: 18,
     maxCapacity: 30,
+    diningCapacity: 24,
     dimensions: '6.4m × 4.8m',
     description: 'Intimate room ideal for committee meetings, seminars, craft workshops, or refreshment staging.',
-    features: ['Meeting Boardroom Layout', 'Quiet Character', 'Natural Daylight', 'Serving Table Space']
+    features: ['Meeting Boardroom Layout', 'Quiet Character', 'Natural Daylight', 'Serving Table Space'],
+    imagePath: 'images/library-room.jpg',
+    seatingLayouts: [
+      {
+        id: 'boardroom',
+        label: 'Boardroom Table',
+        capacity: 20,
+        description: 'Executive conference table arrangement for parish council, trustee, and committee meetings.'
+      },
+      {
+        id: 'theatre',
+        label: 'Seminar Seating',
+        capacity: 30,
+        description: 'Compact row or semicircle seating for small talks, tutoring, and book club gatherings.'
+      },
+      {
+        id: 'banquet',
+        label: 'VIP Green Room / Buffet',
+        capacity: 24,
+        description: 'Configured as a quiet breakout room or drinks/buffet reception lounge supporting Newcombe Hall.'
+      }
+    ]
   }
 }
 
@@ -193,12 +270,10 @@ export interface BookingContactInfo {
 }
 
 /**
- * Generates an inquiry mailto URL and preformatted text body,
- * eliminating Feature Envy in presentation components.
+ * Generates the plain-text inquiry body used for both email clients and clipboard copy.
  */
-export function generateInquiryMailto(quote: HireQuoteOutput, contact: BookingContactInfo): string {
-  const subject = `Room Hire Inquiry - ${quote.roomName} (${contact.date})`
-  const body = [
+export function formatInquiryPlainText(quote: HireQuoteOutput, contact: BookingContactInfo): string {
+  return [
     `Hello Tracy,`,
     ``,
     `I would like to make a provisional room hire inquiry for King Edward Hall:`,
@@ -219,6 +294,15 @@ export function generateInquiryMailto(quote: HireQuoteOutput, contact: BookingCo
     ``,
     `Thank you!`
   ].filter(Boolean).join('\n')
+}
+
+/**
+ * Generates an inquiry mailto URL and preformatted text body,
+ * eliminating Feature Envy in presentation components.
+ */
+export function generateInquiryMailto(quote: HireQuoteOutput, contact: BookingContactInfo): string {
+  const subject = `Room Hire Inquiry - ${quote.roomName} (${contact.date})`
+  const body = formatInquiryPlainText(quote, contact)
 
   return `mailto:roomhire@kingedwardhall.org.uk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
