@@ -21,6 +21,12 @@ export interface RoomRateConfig {
   description: string
   features: string[]
   imagePath: string
+  imageCandidates: string[]
+  galleryPhotos?: {
+    label: string
+    caption: string
+    urls: string[]
+  }[]
   seatingLayouts: SeatingLayoutConfig[]
 }
 
@@ -29,6 +35,9 @@ export interface KitchenRateConfig {
   name: string
   flatRate: number
   description: string
+  imagePath?: string
+  imageCandidates?: string[]
+  facilities?: string[]
 }
 
 export interface EquipmentRateConfig {
@@ -49,7 +58,36 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     dimensions: '15.6m × 8.6m',
     description: 'Largest hall space, ideal for wedding receptions, concerts, parties & exhibitions. Includes stage and PA system with induction loop.',
     features: ['Raised Proscenium Stage', 'PA Induction Hearing Loop', 'Dimmable Lighting', 'Level Access'],
-    imagePath: 'images/newcombe-hall.jpg',
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+    imageCandidates: [
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.jpg',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
+      'images/newcombe-hall.jpg'
+    ],
+    galleryPhotos: [
+      {
+        label: 'Main Hall & Proscenium Stage',
+        caption: 'Newcombe Hall interior (15.6m × 8.6m excluding stage)',
+        urls: [
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.jpg',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+          'images/newcombe-hall.jpg'
+        ]
+      },
+      {
+        label: 'Film Night & Event Seating',
+        caption: 'Newcombe Hall configured for Film Nights and stage screenings',
+        urls: [
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+          'images/newcombe-hall.jpg'
+        ]
+      }
+    ],
     seatingLayouts: [
       {
         id: 'theatre',
@@ -80,8 +118,14 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     diningCapacity: 40,
     dimensions: '9.2m × 6.1m',
     description: 'Medium hall popular for children’s birthday parties, fitness classes, and family gatherings with direct kitchen access.',
-    features: ['Direct Kitchen Hatch', 'Sprung Floor', 'Garden View Windows', 'Wheelchair Ramp'],
-    imagePath: 'images/jubilee-room.jpg',
+    features: ['Direct Kitchen Hatch', 'Sprung Floor', 'French Doors to Patio', 'Wheelchair Ramp'],
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/jubilee-bannerjpg-1200.webp',
+    imageCandidates: [
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/jubilee-bannerjpg-1200.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/jubilee-bannerjpg-1200.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/jubilee-bannerjpg.jpg',
+      'images/jubilee-room.jpg'
+    ],
     seatingLayouts: [
       {
         id: 'theatre',
@@ -112,8 +156,14 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     diningCapacity: 24,
     dimensions: '6.4m × 4.8m',
     description: 'Intimate room ideal for committee meetings, seminars, craft workshops, or refreshment staging.',
-    features: ['Meeting Boardroom Layout', 'Quiet Character', 'Natural Daylight', 'Serving Table Space'],
-    imagePath: 'images/library-room.jpg',
+    features: ['Meeting Boardroom Layout', 'Next to Main Kitchen', 'Natural Daylight', 'Serving Table Space'],
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Library-pano-1920x960-1.webp',
+    imageCandidates: [
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Library-pano-1920x960-1.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Library-pano-1920x960-1.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Library-pano-1920x960-1.jpg',
+      'images/library-room.jpg'
+    ],
     seatingLayouts: [
       {
         id: 'boardroom',
@@ -148,13 +198,41 @@ export const KITCHEN_RATES: Record<KitchenId, KitchenRateConfig> = {
     id: 'main_kitchen',
     name: 'Main Kitchen',
     flatRate: 25,
-    description: 'Fully equipped large catering kitchen accessible to all halls. Includes commercial ovens, warmers, and dishwasher.'
+    description: 'Accessible to all three rooms and the largest of our two kitchens. Upgraded in 2015 with catering gas cooker, hot cupboard, commercial glass washer, and 100-person crockery.',
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/new_kitchen01-header.webp',
+    imageCandidates: [
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/new_kitchen01-header.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/new_kitchen01-header.jpg',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/new_kitchen01-header.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/new_kitchen01-header.jpg.bv.webp',
+      'images/main-kitchen.jpg'
+    ],
+    facilities: [
+      'Catering sized gas cooker & hot cupboard',
+      'Commercial glass washer & refrigerator',
+      'Automatic catering water boiler (permanent boiling water)',
+      'Cups and saucers for 100 persons + microwave oven'
+    ]
   },
   jubilee_kitchen: {
     id: 'jubilee_kitchen',
     name: 'Jubilee Kitchen',
     flatRate: 15,
-    description: 'Compact kitchen adjacent to Jubilee Room, equipped with hot water boiler, fridge, and serving hatch for tea/coffee.'
+    description: 'Smaller kitchen available to hire with any of our three rooms, featuring direct access to the Jubilee Room via a serving hatch.',
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/elementor/thumbs/Jubilee-Kitchen_bg-rhcymvih20kh6y1wuw7nz6mrhbbonp9ioxbdwa40ps.webp.bv.webp',
+    imageCandidates: [
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/elementor/thumbs/Jubilee-Kitchen_bg-rhcymvih20kh6y1wuw7nz6mrhbbonp9ioxbdwa40ps.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/elementor/thumbs/Jubilee-Kitchen_bg-rhcymvih20kh6y1wuw7nz6mrhbbonp9ioxbdwa40ps.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Jubilee-Kitchen_bg.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Jubilee-Kitchen_bg.jpg',
+      'images/jubilee-kitchen.jpg'
+    ],
+    facilities: [
+      'Direct serving hatch access into the Jubilee Room',
+      'Small electric oven, microwave oven & refrigerator',
+      'Automatic catering water boiler supplying permanent boiling water',
+      'Cups and saucers for 50 persons'
+    ]
   }
 }
 

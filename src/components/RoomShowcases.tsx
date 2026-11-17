@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { RoomId, ROOM_RATES, KITCHEN_RATES, SeatingLayoutId } from '../domain/pricing'
 import { TabId } from './Header'
 import { SubNavPills, SubNavItem } from './SubNavPills'
+import { SmartImage } from './SmartImage'
 import { 
   Users, 
   Maximize2, 
@@ -13,7 +14,8 @@ import {
   Printer, 
   Split,
   LayoutGrid,
-  Utensils
+  Utensils,
+  Camera
 } from 'lucide-react'
 
 interface RoomShowcasesProps {
@@ -93,10 +95,10 @@ const ArchitecturalFloorPlanSvg: React.FC<{ roomId: RoomId; layoutId: SeatingLay
           <text x="351" y="114" textAnchor="middle" fill="#E6D3A3" fontSize="8.5" fontWeight="600" transform="rotate(-90 351 114)">
             JUBILEE KITCHEN HATCH
           </text>
-          {/* Garden windows along bottom wall */}
+          {/* French doors along bottom wall */}
           <line x1="70" y1="198" x2="280" y2="198" stroke="#6EE7B7" strokeWidth="3" />
           <text x="175" y="190" textAnchor="middle" fill="#A7F3D0" fontSize="8">
-            West-Facing Garden Windows
+            French Doors to Outside Patio
           </text>
         </g>
       )}
@@ -106,7 +108,7 @@ const ArchitecturalFloorPlanSvg: React.FC<{ roomId: RoomId; layoutId: SeatingLay
           {/* Heritage Bookcases along top & right walls */}
           <rect x="40" y="28" width="260" height="8" fill="rgba(194, 155, 56, 0.35)" />
           <text x="170" y="46" textAnchor="middle" fill="#E6D3A3" fontSize="8">
-            1911 Heritage Timber Bookcases
+            Adjacent to Main Kitchen • Refreshment &amp; Meeting Suite
           </text>
         </g>
       )}
@@ -182,6 +184,7 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
   onSelectRoomForCalculator
 }) => {
   const [selectedLayout, setSelectedLayout] = useState<SeatingLayoutId>('banquet')
+  const [selectedPhotoIdx, setSelectedPhotoIdx] = useState<number>(0)
   const [modalRoomId, setModalRoomId] = useState<RoomId | null>(null)
 
   const activeNavTab: TabId =
@@ -202,7 +205,9 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
     const room = ROOM_RATES[roomId]
     const currentLayoutObj =
       room.seatingLayouts.find((l) => l.id === selectedLayout) || room.seatingLayouts[0]
-    const imageSrc = room.imagePath
+    const gallery = room.galleryPhotos || []
+    const activeGalleryPhoto = gallery[selectedPhotoIdx] || null
+    const imageUrls = activeGalleryPhoto ? activeGalleryPhoto.urls : room.imageCandidates
 
     return (
       <div className="space-y-10 animate-in fade-in duration-200">
@@ -319,11 +324,11 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Bespoke Architectural Interior Visual + Live Schematic */}
+          {/* Right Column: Original KEH Room Photograph + Live Schematic */}
           <div className="lg:col-span-6 space-y-4">
             <div className="group relative rounded-2xl overflow-hidden shadow-elevated border border-brand-forest/15 bg-brand-forest-dark aspect-video">
-              <img
-                src={imageSrc}
+              <SmartImage
+                urls={imageUrls}
                 alt={`${room.name} interior at King Edward Hall, Lindfield (${room.dimensions})`}
                 className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
                 loading="eager"
@@ -332,7 +337,7 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-brand-brass-light block">
-                      King Edward Hall • Ground Floor
+                      {activeGalleryPhoto ? activeGalleryPhoto.label : 'King Edward Hall • Ground Floor'}
                     </span>
                     <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
                       {room.name} ({room.dimensions})
@@ -351,6 +356,40 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Optional multi-photo switcher when room has multiple existing KEH photos */}
+            {gallery.length > 1 && (
+              <div className="flex items-center gap-2">
+                {gallery.map((gPhoto, idx) => {
+                  const isCurrent = idx === selectedPhotoIdx
+                  return (
+                    <button
+                      key={gPhoto.label}
+                      type="button"
+                      onClick={() => setSelectedPhotoIdx(idx)}
+                      className={`flex-1 flex items-center gap-2.5 p-2 rounded-xl border text-left transition-all ${
+                        isCurrent
+                          ? 'bg-brand-forest text-white border-brand-forest shadow-soft'
+                          : 'bg-brand-surface text-brand-forest-dark border-brand-forest/15 hover:border-brand-brass'
+                      }`}
+                    >
+                      <SmartImage
+                        urls={gPhoto.urls}
+                        alt={gPhoto.label}
+                        className="w-12 h-9 rounded-lg object-cover shrink-0"
+                        loading="lazy"
+                      />
+                      <div className="min-w-0">
+                        <span className="text-[11px] font-bold block truncate">{gPhoto.label}</span>
+                        <span className={`text-[10px] flex items-center gap-1 ${isCurrent ? 'text-brand-brass-light' : 'text-brand-text-muted'}`}>
+                          <Camera className="w-3 h-3" /> View Photo
+                        </span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
             {/* Live Architectural Floor Plan Preview */}
             <div className="p-4 rounded-2xl bg-brand-surface border border-brand-forest/10 shadow-soft space-y-2">
@@ -380,7 +419,10 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
       <SubNavPills
         items={ROOM_SUB_NAV_ITEMS}
         activeId={activeNavTab}
-        onSelect={(tab) => setActiveTab(tab)}
+        onSelect={(tab) => {
+          setSelectedPhotoIdx(0)
+          setActiveTab(tab)
+        }}
         ariaLabel="Room showcases navigation"
       />
 
@@ -388,12 +430,12 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
       {currentRoom === 'newcombe' &&
         renderRoomDetail(
           'newcombe',
-          'Grand Hall • Historic 1911',
-          'Formerly known as the Main Hall, this magnificent space was rededicated in memory of Brian Newcombe, voluntary KEH committee leader for over 55 years. Featuring a high vaulted timber-framed ceiling, herringbone wood flooring, raised proscenium stage, and an induction hearing loop, it is Lindfield’s premier choice for wedding celebrations, theatrical shows, conferences, and charity balls.',
+          'Formerly the Main Hall • Historic 1911',
+          'The Newcombe Hall measures 15.6 × 8.6 metres (excluding the stage) and accommodates up to 200 people seated in rows or 100 seated at tables. Renamed in March 2014 in memory of Brian Newcombe (voluntary committee member for over 55 years), the stage and Public Address system with hearing loop make this hall ideal for weddings, large social gatherings, film nights, and charity functions.',
           [
-            'Raised proscenium stage with curtains, stage lighting, and PA sound system.',
-            'Induction hearing loop installed for hearing-aid users across the main floor.',
-            'Direct double-door service access to the commercial Main Kitchen.'
+            'Raised proscenium stage with curtains, stage lighting, and PA sound system with hearing loop.',
+            'We also have a supply of display stands available for exhibitions, craft fairs, and societies.',
+            'Accessible to both the Main Kitchen and Jubilee Kitchen for full event catering.'
           ]
         )}
 
@@ -401,12 +443,12 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
       {currentRoom === 'jubilee' &&
         renderRoomDetail(
           'jubilee',
-          "Built 1977 • Queen's Silver Jubilee",
-          `Opened to celebrate Queen Elizabeth II’s Silver Jubilee, this warm, sunlit hall is the village favourite for children’s birthday parties, fitness classes (yoga, pilates, dance), art societies, and family celebrations. It connects directly to the ${KITCHEN_RATES.jubilee_kitchen.name} for effortless tea, coffee, and cake service.`,
+          'Named for the Silver Jubilee of Queen Elizabeth II',
+          `Our smaller hall, the Jubilee Room, was built in 1977 to celebrate the Silver Jubilee of Queen Elizabeth II. With direct access to the ${KITCHEN_RATES.jubilee_kitchen.name} via a serving hatch and French doors opening onto a small outside patio area, it is a popular venue for children’s birthday parties, classes, and smaller events where catering is required.`,
           [
-            `Direct serving hatch and door access to the ${KITCHEN_RATES.jubilee_kitchen.name} for refreshments.`,
-            'Abundant natural daylight through large west-facing garden windows.',
-            'Warm sprung timber flooring and level wheelchair access with adjacent accessible toilet.'
+            `Direct access to the ${KITCHEN_RATES.jubilee_kitchen.name} via an internal serving hatch.`,
+            'Access to a small outside patio area via glazed French doors.',
+            'Warm sprung timber flooring and step-free access with adjacent accessible facilities.'
           ]
         )}
 
@@ -414,12 +456,12 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
       {currentRoom === 'library' &&
         renderRoomDetail(
           'library',
-          'Intimate Room • Meeting Space',
-          'Originally established as Lindfield’s village library in 1911, this refined room retains its calm, scholarly character. It is ideally configured for parish and committee meetings, AGM presentations, tutoring, interview panels, and intimate workshop gatherings.',
+          'Formerly Lindfield’s Popular Village Library',
+          'Our smallest room, The Library, accommodates up to 30 people seated in rows and is ideally suited for meetings, seminars, and workshops. Situated right next door to the Main Kitchen, it is also a very popular room in which to serve refreshments and buffets when holding larger functions.',
           [
-            'Parish council and club executive meetings with boardroom table arrangement.',
-            'Ideal as a VIP green room or drinks and buffet lounge alongside Newcombe Hall functions.',
-            'Quiet ground-floor position with natural daylight and high-speed Wi-Fi access.'
+            'Ideally suited for committee meetings, clubs, seminars, and small gatherings.',
+            'Situated next door to the Main Kitchen — popular for serving refreshments at larger functions.',
+            'Quiet ground-floor character with natural daylight and included tables and chairs.'
           ]
         )}
 
@@ -434,93 +476,135 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
               Kitchen &amp; Catering Facilities
             </h1>
             <p className="text-sm sm:text-base text-brand-text-muted">
-              King Edward Hall offers two dedicated ground-floor kitchens to accommodate everything from a five-course wedding banquet to a simple tea and cake service.
+              King Edward Hall offers two dedicated ground-floor kitchens available to hire with any of our three rooms — from full 120-place event catering in the Main Kitchen to tea, coffee, and light refreshments in the Jubilee Kitchen.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {/* MAIN KITCHEN CARD WITH ORIGINAL PHOTO */}
             <div 
               role="region"
               aria-label="Main Kitchen specifications"
-              className="p-6 sm:p-8 rounded-2xl bg-brand-surface border border-brand-forest/15 shadow-soft flex flex-col justify-between"
+              className="rounded-2xl bg-brand-surface border border-brand-forest/15 shadow-soft overflow-hidden flex flex-col justify-between"
             >
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-brand-forest/10 text-brand-forest text-xs font-bold uppercase tracking-wider mb-3">
-                  Full Commercial Catering • +£{KITCHEN_RATES.main_kitchen.flatRate} Flat Fee
+                <div className="relative aspect-video bg-brand-forest-dark overflow-hidden">
+                  <SmartImage
+                    urls={KITCHEN_RATES.main_kitchen.imageCandidates || ['images/main-kitchen.jpg']}
+                    alt="Main Kitchen at King Edward Hall, Lindfield"
+                    className="w-full h-full object-cover object-center"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-forest-dark/85 via-transparent to-transparent flex items-end justify-between p-4 sm:p-5">
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand-brass-light block">
+                        Largest of Our Two Kitchens • Upgraded 2015
+                      </span>
+                      <h3 className="font-serif text-2xl font-bold text-white">
+                        {KITCHEN_RATES.main_kitchen.name}
+                      </h3>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-brand-forest text-white text-xs font-bold border border-brand-brass/40">
+                      +£{KITCHEN_RATES.main_kitchen.flatRate} Flat Fee
+                    </span>
+                  </div>
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
-                  {KITCHEN_RATES.main_kitchen.name}
-                </h3>
-                <p className="text-sm text-brand-text-muted mb-6 leading-relaxed">
-                  Our primary large catering kitchen is equipped for professional event caterers and large private functions. Accessible to all three halls via ground-floor service corridors.
-                </p>
-                <ul className="space-y-2.5 text-xs sm:text-sm text-brand-text-muted border-t border-brand-cream-dark pt-4 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Double commercial ovens &amp; high-speed gas hob</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Rapid-cycle commercial pass-through dishwasher</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Large capacity refrigerator and stainless steel prep stations</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Dual serving hatches opening to hall corridors</span>
-                  </li>
-                </ul>
+
+                <div className="p-6 sm:p-8 pb-4">
+                  <p className="text-sm text-brand-text-muted mb-5 leading-relaxed">
+                    The Main Kitchen is accessible to all three of our rooms and is a spacious catering kitchen adequately suited for large functions. King Edward Hall also has its own <strong>120-place setting of crockery and cutlery</strong> available for hire.
+                  </p>
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-brand-text-muted border-t border-brand-cream-dark pt-4 mb-6">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Catering-sized gas cooker &amp; commercial hot cupboard</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Commercial glass washer, refrigerator &amp; microwave oven</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Automatic catering water boiler supplying permanent boiling water</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Cups and saucers for 100 persons (plus 120-place crockery hire available)</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <button
-                onClick={() => handleBookRoom('newcombe')}
-                className="w-full min-h-[46px] bg-brand-forest hover:bg-brand-forest-light text-white rounded-xl text-xs font-bold transition-colors"
-              >
-                Add Main Kitchen in Booking Calculator →
-              </button>
+              <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+                <button
+                  onClick={() => handleBookRoom('newcombe')}
+                  className="w-full min-h-[46px] bg-brand-forest hover:bg-brand-forest-light text-white rounded-xl text-xs font-bold transition-colors"
+                >
+                  Add Main Kitchen in Booking Calculator →
+                </button>
+              </div>
             </div>
 
+            {/* JUBILEE KITCHEN CARD WITH ORIGINAL PHOTO */}
             <div 
               role="region"
               aria-label="Jubilee Kitchen specifications"
-              className="p-6 sm:p-8 rounded-2xl bg-brand-surface border border-brand-brass/30 shadow-soft flex flex-col justify-between"
+              className="rounded-2xl bg-brand-surface border border-brand-brass/30 shadow-soft overflow-hidden flex flex-col justify-between"
             >
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-brand-brass/15 text-brand-forest-dark text-xs font-bold uppercase tracking-wider mb-3">
-                  Light Refreshments • +£{KITCHEN_RATES.jubilee_kitchen.flatRate} Flat Fee
+                <div className="relative aspect-video bg-brand-forest-dark overflow-hidden">
+                  <SmartImage
+                    urls={KITCHEN_RATES.jubilee_kitchen.imageCandidates || ['images/jubilee-kitchen.jpg']}
+                    alt="Jubilee Kitchen at King Edward Hall, Lindfield"
+                    className="w-full h-full object-cover object-center"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-forest-dark/85 via-transparent to-transparent flex items-end justify-between p-4 sm:p-5">
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand-brass-light block">
+                        Smaller Kitchen • Direct Serving Hatch
+                      </span>
+                      <h3 className="font-serif text-2xl font-bold text-white">
+                        {KITCHEN_RATES.jubilee_kitchen.name}
+                      </h3>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-brand-brass text-white text-xs font-bold">
+                      +£{KITCHEN_RATES.jubilee_kitchen.flatRate} Flat Fee
+                    </span>
+                  </div>
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-brand-forest-dark mb-2">
-                  {KITCHEN_RATES.jubilee_kitchen.name}
-                </h3>
-                <p className="text-sm text-brand-text-muted mb-6 leading-relaxed">
-                  An intimate kitchen situated directly beside the Jubilee Room. Designed for tea, coffee, sandwich preparation, and birthday cake staging.
-                </p>
-                <ul className="space-y-2.5 text-xs sm:text-sm text-brand-text-muted border-t border-brand-cream-dark pt-4 mb-6">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Instant continuous hot water boiler (urn)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Domestic refrigerator, sink, and microwave</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Teacups, saucers, plates, and cutlery supply</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-brass shrink-0" />
-                    <span>Direct serving hatch counter into the Jubilee Room</span>
-                  </li>
-                </ul>
+
+                <div className="p-6 sm:p-8 pb-4">
+                  <p className="text-sm text-brand-text-muted mb-5 leading-relaxed">
+                    Our smaller kitchen is available to hire with any of our three rooms and has direct access to the Jubilee Room via a serving hatch — ideal for smaller events, children’s parties, and meetings.
+                  </p>
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-brand-text-muted border-t border-brand-cream-dark pt-4 mb-6">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Direct serving hatch into the Jubilee Room</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Small electric oven, microwave oven &amp; refrigerator</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Automatic catering water boiler supplying permanent boiling water</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-brand-brass shrink-0" />
+                      <span>Cups and saucers for 50 persons</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <button
-                onClick={() => handleBookRoom('jubilee')}
-                className="w-full min-h-[46px] bg-brand-brass hover:bg-brand-brass-hover text-white rounded-xl text-xs font-bold transition-colors"
-              >
-                Book Jubilee Room + Jubilee Kitchen →
-              </button>
+              <div className="px-6 sm:px-8 pb-6 sm:pb-8">
+                <button
+                  onClick={() => handleBookRoom('jubilee')}
+                  className="w-full min-h-[46px] bg-brand-brass hover:bg-brand-brass-hover text-white rounded-xl text-xs font-bold transition-colors"
+                >
+                  Book Jubilee Room + Jubilee Kitchen →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -537,37 +621,47 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
           {(Object.values(ROOM_RATES)).map((room) => (
             <div
               key={room.id}
-              className="bg-brand-surface p-6 rounded-2xl border border-brand-forest/10 shadow-soft flex flex-col justify-between"
+              className="bg-brand-surface rounded-2xl border border-brand-forest/10 shadow-soft overflow-hidden flex flex-col justify-between"
             >
               <div>
-                <div className="flex justify-between items-start gap-2 mb-1">
-                  <h4 className="font-serif text-xl font-bold text-brand-forest-dark">{room.name}</h4>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-forest/10 text-brand-forest">
+                <div className="relative h-36 bg-brand-forest-dark overflow-hidden">
+                  <SmartImage
+                    urls={room.imageCandidates}
+                    alt={room.name}
+                    className="w-full h-full object-cover object-center"
+                    loading="lazy"
+                  />
+                  <span className="absolute top-3 right-3 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-forest-dark/80 backdrop-blur-xs text-white border border-brand-brass/40">
                     {room.maxCapacity} max
                   </span>
                 </div>
-                <div className="text-xs font-semibold text-brand-brass mb-4">
-                  £{room.weekdayRate}/hr weekday • £{room.weekendRate}/hr weekend
-                </div>
-                <div className="space-y-2 text-xs text-brand-text-muted mb-6">
-                  <div>• Dimensions: <strong className="text-brand-text-dark">{room.dimensions}</strong></div>
-                  <div>• Capacity: <strong className="text-brand-text-dark">{room.maxCapacity} seated ({room.diningCapacity} dining)</strong></div>
-                  <div className="pt-2.5 border-t border-brand-cream-dark space-y-1.5">
-                    {room.features.map((feat, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-brand-text-dark">
-                        <Check className="w-3.5 h-3.5 text-brand-brass shrink-0" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
+                <div className="p-6 pb-4">
+                  <h4 className="font-serif text-xl font-bold text-brand-forest-dark mb-1">{room.name}</h4>
+                  <div className="text-xs font-semibold text-brand-brass mb-4">
+                    £{room.weekdayRate}/hr weekday • £{room.weekendRate}/hr weekend
+                  </div>
+                  <div className="space-y-2 text-xs text-brand-text-muted mb-4">
+                    <div>• Dimensions: <strong className="text-brand-text-dark">{room.dimensions}</strong></div>
+                    <div>• Capacity: <strong className="text-brand-text-dark">{room.maxCapacity} seated ({room.diningCapacity} dining)</strong></div>
+                    <div className="pt-2.5 border-t border-brand-cream-dark space-y-1.5">
+                      {room.features.map((feat, i) => (
+                        <div key={i} className="flex items-center gap-1.5 text-brand-text-dark">
+                          <Check className="w-3.5 h-3.5 text-brand-brass shrink-0" />
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => handleBookRoom(room.id)}
-                className="w-full min-h-[44px] bg-brand-forest text-white py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
-              >
-                Estimate {room.name}
-              </button>
+              <div className="px-6 pb-6">
+                <button
+                  onClick={() => handleBookRoom(room.id)}
+                  className="w-full min-h-[44px] bg-brand-forest text-white py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
+                >
+                  Estimate {room.name}
+                </button>
+              </div>
             </div>
           ))}
         </div>
