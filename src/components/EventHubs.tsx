@@ -245,9 +245,26 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               </p>
 
               {stallSubmitted ? (
-                <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Thank you! Your stall interest for <strong>{stallName}</strong> has been received.</span>
+                <div className="p-4 bg-emerald-50 text-emerald-900 rounded-xl text-xs space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Thank you! Your stall interest for <strong>{stallName}</strong> ({stallCategory}) has been prepared.</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <a
+                      href={`mailto:villageday@kingedwardhall.org.uk?subject=${encodeURIComponent(`Village Day Stall Interest - ${stallName}`)}&body=${encodeURIComponent(`Hello Village Day Committee,\n\nI would like to register stallholder interest for Lindfield Village Day (05/06/2027):\n\nBusiness / Charity: ${stallName}\nCategory: ${stallCategory}\n\nThank you!`)}`}
+                      className="inline-flex items-center gap-1.5 bg-brand-forest text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-forest-light transition-colors"
+                    >
+                      <Send className="w-3.5 h-3.5" /> Send Email to Village Day Team
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setStallSubmitted(false)}
+                      className="text-brand-forest underline px-2 py-1"
+                    >
+                      Edit details
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form 
@@ -340,13 +357,25 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               </p>
 
               {runnerRegistered ? (
-                <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-2">
+                <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-3">
                   <Check className="w-8 h-8 text-emerald-600 mx-auto" />
                   <h4 className="font-serif text-lg font-bold">Registration Logged!</h4>
                   <p className="text-xs text-brand-text-muted">
-                    Thank you, <strong>{runnerName}</strong>. You are provisional for the <strong>{runnerRace.toUpperCase()} race</strong>. Check {runnerEmail} for full race pack details.
+                    Thank you, <strong>{runnerName}</strong>. You are provisional for the <strong>{runnerRace.toUpperCase()} race</strong> ({runnerEmail}).
                   </p>
-                  <button onClick={() => setRunnerRegistered(false)} className="text-xs text-brand-forest underline pt-2 block mx-auto">
+                  <div className="pt-1">
+                    <a
+                      href={`mailto:run@kingedwardhall.org.uk?subject=${encodeURIComponent(`Village Run ${runnerRace.toUpperCase()} Entry - ${runnerName}`)}&body=${encodeURIComponent(`Hello Village Run Team,\n\nI would like to pre-register for the Lindfield Village Run (23/05/2027):\n\nRunner Name: ${runnerName}\nEmail: ${runnerEmail}\nDistance: ${runnerRace.toUpperCase()} (${runnerRace === '10k' ? '£20' : '£10'})\n\nThank you!`)}`}
+                      className="inline-flex items-center justify-center gap-1.5 bg-brand-forest text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
+                    >
+                      <Send className="w-3.5 h-3.5" /> Confirm via Email to Race Team
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setRunnerRegistered(false)}
+                    className="text-xs text-brand-forest underline pt-1 block mx-auto"
+                  >
                     Register another runner
                   </button>
                 </div>
@@ -554,15 +583,24 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
               </p>
 
               {cinemaBooked ? (
-                <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-2">
+                <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-3">
                   <Ticket className="w-8 h-8 text-emerald-600 mx-auto" />
                   <h4 className="font-serif text-lg font-bold">Booking Provisional Complete!</h4>
                   <p className="text-xs text-brand-text-muted">
                     {filmTickets} ticket(s) reserved for <strong>{selectedFilm}</strong>. Total to pay on collection: <strong>£{filmTickets * 9}</strong>.
                   </p>
+                  <div className="pt-1">
+                    <a
+                      href={`mailto:secretary@kingedwardhall.org.uk?subject=${encodeURIComponent(`Film Nights Ticket Reservation - ${selectedFilm}`)}&body=${encodeURIComponent(`Hello King Edward Hall Film Nights Team,\n\nI would like to reserve door-collection tickets for:\n\nScreening: ${selectedFilm}\nTickets: ${filmTickets} (£${filmTickets * 9}.00 total)\n\nThank you!`)}`}
+                      className="inline-flex items-center justify-center gap-1.5 bg-brand-forest text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
+                    >
+                      <Send className="w-3.5 h-3.5" /> Send Reservation Email
+                    </a>
+                  </div>
                   <button
+                    type="button"
                     onClick={() => setCinemaBooked(false)}
-                    className="text-xs text-brand-forest underline pt-2 block mx-auto"
+                    className="text-xs text-brand-forest underline pt-1 block mx-auto"
                   >
                     Book for another screening
                   </button>

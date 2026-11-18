@@ -88,18 +88,30 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     return 'bg-brand-cream/80 text-brand-text-dark font-medium hover:bg-brand-cream-dark'
   }
 
+  const handleDropdownBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setActiveDropdown(null)
+    }
+  }
+
+  const handleDropdownKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      setActiveDropdown(null)
+    }
+  }
+
   return (
     <>
       {/* Backdrop overlay rendered outside <header> so backdrop-filter does not clip fixed positioning */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-brand-forest-dark/50 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-brand-forest-dark/50 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <header className="sticky top-0 z-50 bg-brand-surface border-b border-brand-forest/10 shadow-xs transition-all">
+      <header className="sticky top-0 z-50 bg-brand-surface border-b border-brand-forest/10 shadow-sm transition-all">
         {/* Top Utility Bar — Desktop/Tablet only to preserve compact 64px header on mobile */}
         <div className="hidden md:block bg-brand-forest text-brand-cream text-xs py-1.5 px-4 sm:px-8 border-b border-brand-forest-light">
           <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
@@ -143,6 +155,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 className="relative"
                 onMouseEnter={() => setActiveDropdown('rooms')}
                 onMouseLeave={() => setActiveDropdown(null)}
+                onFocus={() => setActiveDropdown('rooms')}
+                onBlur={handleDropdownBlur}
+                onKeyDown={handleDropdownKeyDown}
               >
                 <button
                   type="button"
@@ -153,6 +168,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                       : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                   }`}
                   aria-expanded={activeDropdown === 'rooms'}
+                  aria-haspopup="true"
                 >
                   Room Hire &amp; Facilities
                   <ChevronDown className="w-4 h-4 text-brand-text-muted transition-transform" />
@@ -193,6 +209,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 className="relative"
                 onMouseEnter={() => setActiveDropdown('events')}
                 onMouseLeave={() => setActiveDropdown(null)}
+                onFocus={() => setActiveDropdown('events')}
+                onBlur={handleDropdownBlur}
+                onKeyDown={handleDropdownKeyDown}
               >
                 <button
                   type="button"
@@ -203,6 +222,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                       : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                   }`}
                   aria-expanded={activeDropdown === 'events'}
+                  aria-haspopup="true"
                 >
                   Community Events
                   <ChevronDown className="w-4 h-4 text-brand-text-muted transition-transform" />
@@ -239,6 +259,9 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 className="relative"
                 onMouseEnter={() => setActiveDropdown('about')}
                 onMouseLeave={() => setActiveDropdown(null)}
+                onFocus={() => setActiveDropdown('about')}
+                onBlur={handleDropdownBlur}
+                onKeyDown={handleDropdownKeyDown}
               >
                 <button
                   type="button"
@@ -249,6 +272,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                       : 'text-brand-text-dark hover:text-brand-forest hover:bg-brand-forest/5'
                   }`}
                   aria-expanded={activeDropdown === 'about'}
+                  aria-haspopup="true"
                 >
                   The Hall &amp; Charity
                   <ChevronDown className="w-4 h-4 text-brand-text-muted transition-transform" />

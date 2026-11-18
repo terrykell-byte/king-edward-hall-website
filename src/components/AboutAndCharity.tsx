@@ -9,7 +9,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Filter, 
-  Quote 
+  Quote,
+  Send
 } from 'lucide-react'
 
 interface AboutAndCharityProps {
@@ -316,15 +317,28 @@ export const AboutAndCharity: React.FC<AboutAndCharityProps> = ({ section, setAc
           </div>
 
           {donated ? (
-            <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-2">
+            <div className="p-6 bg-emerald-50 text-emerald-900 rounded-xl text-center space-y-3">
               <ShieldCheck className="w-8 h-8 text-emerald-600 mx-auto" />
               <h4 className="font-serif text-lg font-bold">Thank You For Your Support!</h4>
               <p className="text-xs text-brand-text-muted">
-                Your pledge of <strong>£{donationAmount}</strong> (with Gift Aid boosting value to <strong>£{(donationAmount * 1.25).toFixed(2)}</strong>) has been logged.
+                Your pledge of <strong>£{donationAmount}</strong>
+                {giftAid ? (
+                  <> (with Gift Aid boosting value to <strong>£{(donationAmount * 1.25).toFixed(2)}</strong>)</>
+                ) : null}{' '}
+                has been prepared for the Charitable Trust.
               </p>
+              <div className="pt-1">
+                <a
+                  href={`mailto:secretary@kingedwardhall.org.uk?subject=${encodeURIComponent(`Charity Donation Pledge (£${donationAmount}) - King Edward Hall`)}&body=${encodeURIComponent(`Hello Hon. Secretary,\n\nI would like to make a charitable donation to King Edward Hall Charitable Trust (Charity No. 249649):\n\nDonation Amount: £${donationAmount}.00\nGift Aid Declaration: ${giftAid ? `Yes (+25% HMRC Gift Aid, total value £${(donationAmount * 1.25).toFixed(2)})` : 'No'}\n\nPlease reply with the charity BACS / Gift Aid details.\n\nThank you!`)}`}
+                  className="inline-flex items-center justify-center gap-1.5 bg-brand-forest text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-brand-forest-light transition-colors"
+                >
+                  <Send className="w-3.5 h-3.5" /> Email Donation Pledge to Trustees
+                </a>
+              </div>
               <button
+                type="button"
                 onClick={() => setDonated(false)}
-                className="text-xs text-brand-forest underline pt-2 block mx-auto"
+                className="text-xs text-brand-forest underline pt-1 block mx-auto"
               >
                 Make another donation
               </button>

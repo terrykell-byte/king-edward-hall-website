@@ -200,13 +200,13 @@ export const FrontPageSlideDeck: React.FC<FrontPageSlideDeckProps> = ({ setActiv
 
         {/* Top Bar: Slide Counter & Auto-play Toggle */}
         <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-forest-dark/80 backdrop-blur-xs border border-brand-brass/40 text-[11px] font-bold uppercase tracking-wider text-brand-brass-light">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-forest-dark/80 backdrop-blur-sm border border-brand-brass/40 text-[11px] font-bold uppercase tracking-wider text-brand-brass-light">
             <Camera className="w-3.5 h-3.5 text-brand-brass" />
             <span>{currentSlide.category}</span>
           </span>
 
           <div className="flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-xs text-[11px] font-semibold text-white/90">
+            <span className="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[11px] font-semibold text-white/90">
               {activeIndex + 1} / {totalSlides}
             </span>
             <button

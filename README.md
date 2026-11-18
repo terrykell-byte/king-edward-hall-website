@@ -54,21 +54,21 @@ flowchart TD
 
 ### 1. Instant Pricing Engine & Booking Inquiries
 - **Interactive Quote Calculator**: Live calculation based on room capacity, duration, day of week, and time of day.
-- **Accurate Rate Logic**: Automatically applies weekend peak rates (£38/hr Newcombe, £24/hr Jubilee, £18/hr Library) for Friday evenings ($\ge$ 18:00) and all-day Saturday/Sunday; weekday rates apply Monday–Friday daytime.
+- **Accurate Rate Logic**: Automatically applies weekend peak rates (£38/hr Newcombe, £24/hr Jubilee, £18/hr Library) for Friday evenings ($\ge$ 18:00 or sessions extending past 18:00) and all-day Saturday/Sunday; weekday rates apply Monday–Friday daytime.
 - **Add-on Facilities**: Main catering kitchen (£25/session), Jubilee Kitchen (£15/session), PA sound system with induction hearing loop (£20), and AV multimedia projector (£15).
-- **Automated Mailto Inquiry Generator**: Instant pre-filled booking draft formatted directly for the Hall Booking Secretary with exact quote breakdown, requested date/time, and client details.
+- **Automated Mailto Inquiry Generator**: Instant pre-filled booking draft and clipboard summary formatted directly for the Hall Booking Administrator with exact quote breakdown, requested date/time, guest count, and client details.
 
 ### 2. Village Events Hub & Live Countdowns
-- **Lindfield Village Day (05/06/2027)**: 49th annual village celebration info, parade overview, and interactive stallholder inquiry submission.
-- **Lindfield Village Run (23/05/2027)**: 5K & 10K road/cross-country event details with interactive runner registration form and live countdown ticker.
-- **Film Nights Cinema**: Monthly village screenings in Newcombe Hall with ticket reservation builder and licensed bar details.
+- **Lindfield Village Day (05/06/2027)**: 49th annual village celebration info, parade overview, and interactive stallholder inquiry submission (`villageday@kingedwardhall.org.uk`).
+- **Lindfield Village Run (23/05/2027)**: 5K & 10K road/cross-country event details with interactive runner registration form (`run@kingedwardhall.org.uk`) and live countdown ticker.
+- **Film Nights Cinema**: Monthly village screenings in Newcombe Hall with clickable film selection and ticket reservation builder (`secretary@kingedwardhall.org.uk`).
 - **Community Sponsors**: Transparent recognition of local High Street partners and King Edward Hall sponsors.
 
 ### 3. Edwardian Heritage & Charitable Trust
-- **1911 Timeline**: Interactive archival journey from the 1910 building committee and opening ceremony to mid-century modernization and present-day stewardship.
+- **1911 Timeline**: Interactive archival journey from the 1911 opening ceremony and WWI Red Cross hospital to WWII evacuees, the 1977 Jubilee Room, and present-day stewardship.
 - **Lindfield Club Separation FAQ**: Clear delineation explaining that the first-floor Lindfield Club (with private snooker tables and member bar) is legally and operationally distinct from King Edward Hall Charitable Trust.
-- **Gift Aid Donation Calculator**: Demonstrates the real-world value of charitable donations, automatically computing the 25% HMRC Gift Aid uplift.
-- **Community Reviews**: Filterable review carousel featuring verified Lindfield wedding couples, party organizers, theater attendees, and regular class instructors.
+- **Gift Aid Donation Calculator**: Demonstrates the real-world value of charitable donations, automatically computing the 25% HMRC Gift Aid uplift and preparing a donation pledge email.
+- **Community Reviews**: Filterable review carousel featuring verified Lindfield wedding couples, party organizers, cinema attendees, and regular class instructors.
 
 ---
 
@@ -77,8 +77,8 @@ flowchart TD
 - **Core**: React 19, TypeScript 5.7, Vite 6
 - **Styling**: Tailwind CSS 3 with custom heritage design system (`brand-forest`, `brand-brass`, `brand-cream`)
 - **Icons**: Lucide React
-- **Testing**: Vitest 3 with comprehensive domain seam test coverage
-- **CI/CD**: GitHub Actions automated workflow deploying to GitHub Pages
+- **Testing**: Vitest 3 with comprehensive domain seam test coverage (11 tests)
+- **CI/CD**: GitHub Actions automated workflow running unit tests and deploying to GitHub Pages
 - **Engineering Standards**: Developed following Matt Pocock's agentic engineering skills (TDD on pricing seams, tracer-bullet ticketing under `.scratch/`, domain glossary compliance).
 
 ---
@@ -112,7 +112,7 @@ npm run preview
 
 ```
 king-edward-hall-website/
-├── .github/workflows/deploy.yml   # GitHub Pages automated deployment
+├── .github/workflows/deploy.yml   # GitHub Pages automated test & deploy
 ├── .scratch/website-redesign/     # Tracer-bullet tickets & spec
 │   ├── spec.md                    # Formal redesign specification
 │   └── issues/                    # KEH-001 through KEH-007 tickets
@@ -123,13 +123,17 @@ king-edward-hall-website/
 │   ├── components/                # React UI components
 │   │   ├── Header.tsx             # 3-pillar navigation & mobile drawer
 │   │   ├── Footer.tsx             # Charity registration, pillars, links
+│   │   ├── FrontPageSlideDeck.tsx # Hero photo carousel & thumbnail strip
 │   │   ├── BookingCalculator.tsx  # Quote builder & inquiry generator
-│   │   ├── RoomShowcases.tsx      # Room details, comparison, doc modal
+│   │   ├── RoomShowcases.tsx      # Room details, floor plans, comparison
 │   │   ├── EventHubs.tsx          # Village Day, Run, Film Nights, Sponsors
-│   │   └── AboutAndCharity.tsx    # 1911 timeline, FAQ, Gift Aid, reviews
+│   │   ├── AboutAndCharity.tsx    # 1911 timeline, FAQ, Gift Aid, reviews
+│   │   ├── SmartImage.tsx         # Multi-URL image loader with local fallback
+│   │   ├── SubNavPills.tsx        # Horizontal scroll-snap section pills
+│   │   └── BrandIcons.tsx         # Signature KEH logo & pillar SVG icons
 │   ├── domain/                    # Pure business logic & seam tests
-│   │   ├── pricing.ts             # Pricing engine, rules, rates
-│   │   └── __tests__/pricing.test.ts # Vitest unit tests (8 tests)
+│   │   ├── pricing.ts             # Pricing engine, rules, rates, date helpers
+│   │   └── __tests__/pricing.test.ts # Vitest unit tests (11 tests)
 │   ├── App.tsx                    # Root routing & layout container
 │   ├── main.tsx                   # React root entry point
 │   └── index.css                  # Tailwind styles & theme variables

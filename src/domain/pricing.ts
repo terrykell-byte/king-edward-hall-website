@@ -269,13 +269,36 @@ export interface HireQuoteOutput {
   kitchenCost: number
   equipmentCost: number
   equipmentNames: string[]
+  guestCount: number
   estimatedTotal: number
   capacityWarning: string | null
 }
 
 /**
+ * Formats a Date object as YYYY-MM-DD in local time (avoiding UTC day-shift bugs).
+ */
+export function formatLocalDate(d: Date): string {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
+ * Returns the YYYY-MM-DD date string for the Saturday approximately 3 weeks ahead in local time.
+ */
+export function getDefaultSaturdayDate(baseDate: Date = new Date()): string {
+  const target = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() + 21)
+  const dayOfWeek = target.getDay()
+  const daysUntilSaturday = (6 - dayOfWeek + 7) % 7
+  target.setDate(target.getDate() + daysUntilSaturday)
+  return formatLocalDate(target)
+}
+
+/**
  * Pure calculation seam for King Edward Hall room hire quotes.
- * Enforces peak rate on Friday evening (from 18:00 onwards), Saturdays, and Sundays.
+ * Enforces peak rate on Friday evening (from 18:00 onwards, including sessions extending past 18:00),
+ * Saturdays, and Sundays.
  */
 export function calculateHireQuote(input: HireQuoteInput): HireQuoteOutput {
   const room = ROOM_RATES[input.roomId]
@@ -286,18 +309,38 @@ export function calculateHireQuote(input: HireQuoteInput): HireQuoteOutput {
   const kitchen = KITCHEN_RATES[input.kitchenId] || KITCHEN_RATES.none
   const selectedEquipment = input.equipmentIds || []
 
-  // Determine peak rate: Friday >= 18:00, Saturday (all day), Sunday (all day)
-  const [year, month, day] = input.date.split('-').map(Number)
-  const dateObj = new Date(year, month - 1, day)
-  const dayOfWeek = dateObj.getDay() // 0 = Sunday, 5 = Friday, 6 = Saturday
+  const safeDuration = Math.max(
+    1,
+    Number.isFinite(input.durationHours) ? Math.round(input.durationHours) : 1
+  )
+  const safeGuestCount = Math.max(
+    1,
+    Number.isFinite(input.guestCount) ? Math.round(input.guestCount) : 1
+  )
 
-  const hourNumber = parseInt(input.startTime.split(':')[0] || '0', 10)
-  const isFridayEvening = dayOfWeek === 5 && hourNumber >= 18
+  // Determine peak rate: Friday >= 18:00 (or extending past 18:00), Saturday (all day), Sunday (all day)
+  let dayOfWeek = -1
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input.date)) {
+    const [year, month, day] = input.date.split('-').map(Number)
+    const dateObj = new Date(year, month - 1, day)
+    if (!Number.isNaN(dateObj.getTime())) {
+      dayOfWeek = dateObj.getDay() // 0 = Sunday, 5 = Friday, 6 = Saturday
+    }
+  }
+
+  const [rawHour, rawMinute] = (input.startTime || '00:00').split(':')
+  const parsedHour = parseInt(rawHour || '0', 10)
+  const parsedMinute = parseInt(rawMinute || '0', 10)
+  const hourNumber = Number.isFinite(parsedHour) ? parsedHour : 0
+  const minuteNumber = Number.isFinite(parsedMinute) ? parsedMinute : 0
+  const sessionEndHour = hourNumber + minuteNumber / 60 + safeDuration
+
+  const isFridayEvening = dayOfWeek === 5 && (hourNumber >= 18 || sessionEndHour > 18)
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
   const isPeakRate = isWeekend || isFridayEvening
 
   const hourlyRate = isPeakRate ? room.weekendRate : room.weekdayRate
-  const totalRoomCost = hourlyRate * Math.max(1, input.durationHours)
+  const totalRoomCost = hourlyRate * safeDuration
   const kitchenCost = kitchen.flatRate
 
   let equipmentCost = 0
@@ -313,8 +356,8 @@ export function calculateHireQuote(input: HireQuoteInput): HireQuoteOutput {
   const estimatedTotal = totalRoomCost + kitchenCost + equipmentCost
 
   let capacityWarning: string | null = null
-  if (input.guestCount > room.maxCapacity) {
-    capacityWarning = `Expected guests (${input.guestCount}) exceeds ${room.name} maximum seated capacity (${room.maxCapacity}).`
+  if (safeGuestCount > room.maxCapacity) {
+    capacityWarning = `Expected guests (${safeGuestCount}) exceeds ${room.name} maximum seated capacity (${room.maxCapacity}).`
   }
 
   return {
@@ -322,13 +365,14 @@ export function calculateHireQuote(input: HireQuoteInput): HireQuoteOutput {
     roomName: room.name,
     isPeakRate,
     hourlyRate,
-    durationHours: input.durationHours,
+    durationHours: safeDuration,
     totalRoomCost,
     kitchenId: input.kitchenId,
     kitchenName: kitchen.name,
     kitchenCost,
     equipmentCost,
     equipmentNames,
+    guestCount: safeGuestCount,
     estimatedTotal,
     capacityWarning
   }
@@ -356,6 +400,8 @@ export function formatInquiryPlainText(quote: HireQuoteOutput, contact: BookingC
     `Room: ${quote.roomName}`,
     `Date: ${contact.date} (${quote.isPeakRate ? 'Peak Weekend / Evening' : 'Standard Weekday'})`,
     `Time: ${contact.startTime} (${quote.durationHours} hours)`,
+    `Attendees: ${quote.guestCount} guests`,
+    quote.capacityWarning ? `Capacity Note: ${quote.capacityWarning}` : null,
     `Kitchen: ${quote.kitchenName} (£${quote.kitchenCost})`,
     quote.equipmentNames.length > 0 ? `Equipment: ${quote.equipmentNames.join(', ')} (£${quote.equipmentCost})` : null,
     `Estimated Total Hire: £${quote.estimatedTotal}`,

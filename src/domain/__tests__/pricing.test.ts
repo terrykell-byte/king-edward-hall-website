@@ -3,6 +3,8 @@ import {
   calculateHireQuote,
   generateInquiryMailto,
   formatInquiryPlainText,
+  formatLocalDate,
+  getDefaultSaturdayDate,
   ROOM_RATES,
   KITCHEN_RATES,
   EQUIPMENT_RATES
@@ -25,6 +27,7 @@ describe('calculateHireQuote', () => {
     expect(quote.totalRoomCost).toBe(112)
     expect(quote.kitchenCost).toBe(0)
     expect(quote.equipmentCost).toBe(0)
+    expect(quote.guestCount).toBe(80)
     expect(quote.estimatedTotal).toBe(112)
     expect(quote.capacityWarning).toBeNull()
   })
@@ -45,8 +48,24 @@ describe('calculateHireQuote', () => {
     expect(quote.totalRoomCost).toBe(152)
   })
 
+  it('triggers peak rate when a Friday afternoon booking extends past 18:00', () => {
+    // 2026-11-20 is a Friday, 16:00 for 4 hours ends at 20:00 (> 18:00)
+    const quote = calculateHireQuote({
+      roomId: 'newcombe',
+      date: '2026-11-20',
+      startTime: '16:00',
+      durationHours: 4,
+      kitchenId: 'none',
+      guestCount: 100
+    })
+
+    expect(quote.isPeakRate).toBe(true)
+    expect(quote.hourlyRate).toBe(38)
+    expect(quote.totalRoomCost).toBe(152)
+  })
+
   it('treats Friday daytime prior to 18:00 as standard off-peak', () => {
-    // 2026-11-20 is a Friday
+    // 2026-11-20 is a Friday, 14:00 for 3 hours ends at 17:00 (<= 18:00)
     const quote = calculateHireQuote({
       roomId: 'newcombe',
       date: '2026-11-20',
@@ -115,7 +134,23 @@ describe('calculateHireQuote', () => {
     )
   })
 
-  it('generates structured mailto URI and plain text inquiry summary avoiding feature envy', () => {
+  it('sanitizes empty dates and invalid duration or guestCount gracefully', () => {
+    const quote = calculateHireQuote({
+      roomId: 'library',
+      date: '',
+      startTime: '',
+      durationHours: Number.NaN,
+      kitchenId: 'none',
+      guestCount: -10
+    })
+
+    expect(quote.durationHours).toBe(1)
+    expect(quote.guestCount).toBe(1)
+    expect(quote.isPeakRate).toBe(false)
+    expect(quote.totalRoomCost).toBe(14)
+  })
+
+  it('generates structured mailto URI and plain text inquiry summary including guest count', () => {
     const quote = calculateHireQuote({
       roomId: 'newcombe',
       date: '2026-11-21',
@@ -136,6 +171,7 @@ describe('calculateHireQuote', () => {
 
     const plainText = formatInquiryPlainText(quote, contact)
     expect(plainText).toContain('Room: Newcombe Hall')
+    expect(plainText).toContain('Attendees: 100 guests')
     expect(plainText).toContain('Estimated Total Hire: £177')
     expect(plainText).toContain('Name: John Doe')
 
@@ -143,6 +179,17 @@ describe('calculateHireQuote', () => {
     expect(mailto).toContain('mailto:roomhire@kingedwardhall.org.uk')
     expect(mailto).toContain('John%20Doe')
     expect(mailto).toContain('Newcombe%20Hall')
+    expect(mailto).toContain('100%20guests')
+  })
+
+  it('computes a valid Saturday date approximately 3 weeks ahead in local time', () => {
+    const wednesday = new Date(2026, 10, 18) // 18 Nov 2026 (Wednesday)
+    expect(formatLocalDate(wednesday)).toBe('2026-11-18')
+
+    const satStr = getDefaultSaturdayDate(wednesday)
+    const [y, m, d] = satStr.split('-').map(Number)
+    const satDate = new Date(y, m - 1, d)
+    expect(satDate.getDay()).toBe(6) // 6 === Saturday
   })
 
   it('exposes defined rates, seating layouts, and visual asset paths', () => {

@@ -6,6 +6,8 @@ import {
   calculateHireQuote, 
   generateInquiryMailto,
   formatInquiryPlainText,
+  formatLocalDate,
+  getDefaultSaturdayDate,
   RoomId, 
   KitchenId,
   EquipmentId
@@ -31,25 +33,31 @@ import {
 
 interface BookingCalculatorProps {
   initialRoomId?: RoomId
+  initialKitchenId?: KitchenId
   showMobileStickyBar?: boolean
 }
 
 export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   initialRoomId = 'newcombe',
+  initialKitchenId = 'none',
   showMobileStickyBar = true
 }) => {
   const [roomId, setRoomId] = useState<RoomId>(initialRoomId)
+  const [kitchenId, setKitchenId] = useState<KitchenId>(initialKitchenId)
 
   useEffect(() => {
     setRoomId(initialRoomId)
   }, [initialRoomId])
 
-  // Default to a Saturday 3 weeks ahead
-  const defaultDate = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  const [date, setDate] = useState<string>(defaultDate)
+  useEffect(() => {
+    setKitchenId(initialKitchenId)
+  }, [initialKitchenId])
+
+  // Default to a Saturday ~3 weeks ahead in local time
+  const todayLocal = formatLocalDate(new Date())
+  const [date, setDate] = useState<string>(() => getDefaultSaturdayDate())
   const [startTime, setStartTime] = useState<string>('14:00')
   const [durationHours, setDurationHours] = useState<number>(4)
-  const [kitchenId, setKitchenId] = useState<KitchenId>('none')
   const [equipmentIds, setEquipmentIds] = useState<EquipmentId[]>([])
   const [guestCount, setGuestCount] = useState<number>(60)
   const [isRecurring, setIsRecurring] = useState<boolean>(false)
@@ -89,6 +97,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const errors: string[] = []
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      errors.push('Please select a valid event date')
+    } else if (date < todayLocal) {
+      errors.push('Event date cannot be in the past')
+    }
+    if (!Number.isFinite(guestCount) || guestCount < 1) {
+      errors.push('Please enter at least 1 expected guest')
+    }
     if (!name.trim()) errors.push('Please enter your full name')
     if (!email.trim() || !email.includes('@')) errors.push('Please enter a valid email address')
     if (!phone.trim()) errors.push('Please enter a contact telephone number')
@@ -265,7 +281,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               <input 
                 type="date"
                 value={date}
-                min={new Date().toISOString().split('T')[0]}
+                min={todayLocal}
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full min-h-[44px] text-sm bg-white border border-brand-forest/20 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-brand-brass"
                 required
@@ -353,7 +369,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   min={1}
                   max={250}
                   aria-label="Expected Guests"
-                  onChange={(e) => setGuestCount(Number(e.target.value))}
+                  onChange={(e) => {
+                    const parsed = parseInt(e.target.value, 10)
+                    setGuestCount(Number.isFinite(parsed) ? Math.max(1, Math.min(250, parsed)) : 1)
+                  }}
                   className="w-full min-h-[44px] text-sm font-semibold text-center bg-white border border-brand-forest/20 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-brand-brass"
                   required
                 />

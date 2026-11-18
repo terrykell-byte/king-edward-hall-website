@@ -26,10 +26,10 @@ During this session, we completed the full architectural redesign, domain modeli
 
 ## 2. Current Environment & Project State
 
-- **Codebase Path**: `/home/antigravity`
+- **Codebase Path**: `/home/antigravity/terrykell-byte/king-edward-hall-website`
 - **Git Status**: Clean working tree on `main`, synchronized with remote `origin/main`.
-- **Test Status**: 8/8 tests passing (`npm test` / Vitest in 5ms).
-- **Build Status**: Production bundle builds cleanly (`npm run build` in 2.5s).
+- **Test Status**: 11/11 tests passing (`npm test` / Vitest in 5ms).
+- **Build Status**: Production bundle builds cleanly (`npm run build` in ~2.8s).
 - **Live URL**: Accessible globally on any phone or desktop at `https://terrykell-byte.github.io/king-edward-hall-website/`.
 
 ---

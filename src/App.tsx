@@ -8,7 +8,7 @@ import { AboutAndCharity } from './components/AboutAndCharity'
 import { FrontPageSlideDeck } from './components/FrontPageSlideDeck'
 import { SmartImage } from './components/SmartImage'
 import { PillarVenueIcon, PillarFestivalIcon, PillarHeritageIcon } from './components/BrandIcons'
-import { ROOM_RATES, KITCHEN_RATES, RoomId } from './domain/pricing'
+import { ROOM_RATES, KITCHEN_RATES, RoomId, KitchenId } from './domain/pricing'
 import { 
   Calendar, 
   Star, 
@@ -27,6 +27,7 @@ function getTabFromHash(): TabId {
 export function App() {
   const [activeTab, setActiveTabState] = useState<TabId>(getTabFromHash)
   const [selectedCalculatorRoom, setSelectedCalculatorRoom] = useState<RoomId>('newcombe')
+  const [selectedCalculatorKitchen, setSelectedCalculatorKitchen] = useState<KitchenId>('none')
 
   const setActiveTab = useCallback((tab: TabId) => {
     setActiveTabState(tab)
@@ -50,8 +51,9 @@ export function App() {
     }
   }, [])
 
-  const handleOpenCalculatorForRoom = useCallback((roomId: RoomId) => {
+  const handleOpenCalculatorForRoom = useCallback((roomId: RoomId, kitchenId: KitchenId = 'none') => {
     setSelectedCalculatorRoom(roomId)
+    setSelectedCalculatorKitchen(kitchenId)
     setActiveTab('calculator')
   }, [setActiveTab])
 
@@ -153,7 +155,7 @@ export function App() {
                 className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
-              <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-forest-dark/80 backdrop-blur-xs text-[10px] font-bold uppercase tracking-wider text-brand-brass-light border border-brand-brass/30">
+              <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-forest-dark/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-brand-brass-light border border-brand-brass/30">
                 <Utensils className="w-3 h-3 text-brand-brass" /> +£{kitchen.flatRate} Flat Rate
               </span>
             </button>
@@ -354,7 +356,11 @@ export function App() {
 
           {/* Interactive Calculator Section embedded on home */}
           <section className="bg-brand-cream-dark/50 py-10 sm:py-12 px-4 sm:px-8 border-y border-brand-cream-dark">
-            <BookingCalculator initialRoomId={selectedCalculatorRoom} showMobileStickyBar={false} />
+            <BookingCalculator
+              initialRoomId={selectedCalculatorRoom}
+              initialKitchenId={selectedCalculatorKitchen}
+              showMobileStickyBar={false}
+            />
           </section>
         </div>
       )
@@ -536,7 +542,11 @@ export function App() {
           </div>
 
           {/* Embedded Calculator */}
-          <BookingCalculator initialRoomId={selectedCalculatorRoom} showMobileStickyBar={false} />
+          <BookingCalculator
+            initialRoomId={selectedCalculatorRoom}
+            initialKitchenId={selectedCalculatorKitchen}
+            showMobileStickyBar={false}
+          />
         </div>
       )
     }
@@ -581,7 +591,11 @@ export function App() {
     if (activeTab === 'calculator') {
       return (
         <div className="py-4 sm:py-8 px-4 sm:px-8">
-          <BookingCalculator initialRoomId={selectedCalculatorRoom} showMobileStickyBar={true} />
+          <BookingCalculator
+            initialRoomId={selectedCalculatorRoom}
+            initialKitchenId={selectedCalculatorKitchen}
+            showMobileStickyBar={true}
+          />
         </div>
       )
     }

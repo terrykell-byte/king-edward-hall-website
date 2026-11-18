@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { RoomId, ROOM_RATES, KITCHEN_RATES, SeatingLayoutId } from '../domain/pricing'
+import React, { useState, useEffect } from 'react'
+import { RoomId, KitchenId, ROOM_RATES, KITCHEN_RATES, SeatingLayoutId } from '../domain/pricing'
 import { TabId } from './Header'
 import { SubNavPills, SubNavItem } from './SubNavPills'
 import { SmartImage } from './SmartImage'
@@ -21,7 +21,7 @@ import {
 interface RoomShowcasesProps {
   currentRoom: RoomId | 'kitchens'
   setActiveTab: (tab: TabId) => void
-  onSelectRoomForCalculator?: (roomId: RoomId) => void
+  onSelectRoomForCalculator?: (roomId: RoomId, kitchenId?: KitchenId) => void
 }
 
 const ROOM_SUB_NAV_ITEMS: SubNavItem<TabId>[] = [
@@ -187,14 +187,34 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
   const [selectedPhotoIdx, setSelectedPhotoIdx] = useState<number>(0)
   const [modalRoomId, setModalRoomId] = useState<RoomId | null>(null)
 
+  useEffect(() => {
+    setSelectedPhotoIdx(0)
+  }, [currentRoom])
+
+  useEffect(() => {
+    if (!modalRoomId) {
+      document.body.style.overflow = ''
+      return
+    }
+    document.body.style.overflow = 'hidden'
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModalRoomId(null)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [modalRoomId])
+
   const activeNavTab: TabId =
     currentRoom === 'kitchens'
       ? 'kitchens'
       : (`room-${currentRoom}` as TabId)
 
-  const handleBookRoom = (roomId: RoomId) => {
+  const handleBookRoom = (roomId: RoomId, kitchenId?: KitchenId) => {
     if (onSelectRoomForCalculator) {
-      onSelectRoomForCalculator(roomId)
+      onSelectRoomForCalculator(roomId, kitchenId)
     } else {
       setActiveTab('calculator')
     }
@@ -344,11 +364,11 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
                     </h3>
                   </div>
                   <div className="flex flex-wrap gap-1.5 text-[11px]">
-                    <span className="px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-xs text-white font-medium flex items-center gap-1">
+                    <span className="px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-sm text-white font-medium flex items-center gap-1">
                       <Accessibility className="w-3.5 h-3.5 text-brand-brass-light" /> Step-Free
                     </span>
                     {roomId === 'newcombe' && (
-                      <span className="px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-xs text-white font-medium flex items-center gap-1">
+                      <span className="px-2.5 py-1 rounded-lg bg-white/15 backdrop-blur-sm text-white font-medium flex items-center gap-1">
                         <Music className="w-3.5 h-3.5 text-brand-brass-light" /> Stage &amp; PA Loop
                       </span>
                     )}
@@ -536,7 +556,7 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
               </div>
               <div className="px-6 sm:px-8 pb-6 sm:pb-8">
                 <button
-                  onClick={() => handleBookRoom('newcombe')}
+                  onClick={() => handleBookRoom('newcombe', 'main_kitchen')}
                   className="w-full min-h-[46px] bg-brand-forest hover:bg-brand-forest-light text-white rounded-xl text-xs font-bold transition-colors"
                 >
                   Add Main Kitchen in Booking Calculator →
@@ -599,7 +619,7 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
               </div>
               <div className="px-6 sm:px-8 pb-6 sm:pb-8">
                 <button
-                  onClick={() => handleBookRoom('jubilee')}
+                  onClick={() => handleBookRoom('jubilee', 'jubilee_kitchen')}
                   className="w-full min-h-[46px] bg-brand-brass hover:bg-brand-brass-hover text-white rounded-xl text-xs font-bold transition-colors"
                 >
                   Book Jubilee Room + Jubilee Kitchen →
@@ -631,7 +651,7 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
                     className="w-full h-full object-cover object-center"
                     loading="lazy"
                   />
-                  <span className="absolute top-3 right-3 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-forest-dark/80 backdrop-blur-xs text-white border border-brand-brass/40">
+                  <span className="absolute top-3 right-3 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-forest-dark/80 backdrop-blur-sm text-white border border-brand-brass/40">
                     {room.maxCapacity} max
                   </span>
                 </div>
@@ -670,7 +690,10 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
       {/* Interactive Architectural Floor Plan & Premises Modal */}
       {modalRoomId && (
         <div
-          className="fixed inset-0 z-50 bg-brand-forest-dark/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="floor-plan-modal-title"
+          className="fixed inset-0 z-50 bg-brand-forest-dark/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setModalRoomId(null)}
         >
           <div
@@ -682,11 +705,12 @@ export const RoomShowcases: React.FC<RoomShowcasesProps> = ({
                 <span className="text-[11px] font-bold uppercase tracking-wider text-brand-brass block">
                   Architectural Schematic &amp; Premises Rules
                 </span>
-                <h4 className="font-serif text-xl font-bold text-brand-forest-dark">
+                <h4 id="floor-plan-modal-title" className="font-serif text-xl font-bold text-brand-forest-dark">
                   {ROOM_RATES[modalRoomId].name} ({ROOM_RATES[modalRoomId].dimensions})
                 </h4>
               </div>
               <button 
+                type="button"
                 onClick={() => setModalRoomId(null)} 
                 className="min-w-[36px] min-h-[36px] rounded-lg hover:bg-brand-cream text-brand-text-muted hover:text-brand-forest-dark text-base font-bold"
                 aria-label="Close floor plan viewer"
