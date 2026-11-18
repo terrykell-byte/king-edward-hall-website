@@ -92,7 +92,7 @@ export const FRONT_PAGE_SLIDES: SlideDeckItem[] = [
     ctaLabel: 'Book Film Tickets',
     urls: [
       'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp',
       'images/newcombe-hall.jpg'
     ]
   },

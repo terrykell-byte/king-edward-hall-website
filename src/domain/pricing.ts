@@ -58,32 +58,28 @@ export const ROOM_RATES: Record<RoomId, RoomRateConfig> = {
     dimensions: '15.6m × 8.6m',
     description: 'Largest hall space, ideal for wedding receptions, concerts, parties & exhibitions. Includes stage and PA system with induction loop.',
     features: ['Raised Proscenium Stage', 'PA Induction Hearing Loop', 'Dimmable Lighting', 'Level Access'],
-    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+    imagePath: 'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
     imageCandidates: [
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.jpg',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp.bv.webp',
-      'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
       'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
+      'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp',
       'images/newcombe-hall.jpg'
     ],
     galleryPhotos: [
       {
-        label: 'Main Hall & Proscenium Stage',
+        label: 'Newcombe Hall & Stage',
         caption: 'Newcombe Hall interior (15.6m × 8.6m excluding stage)',
         urls: [
-          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.webp',
-          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/Newcombe-Hall-1920x960.jpg',
-          'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp',
           'images/newcombe-hall.jpg'
         ]
       },
       {
-        label: 'Film Night & Event Seating',
-        caption: 'Newcombe Hall configured for Film Nights and stage screenings',
+        label: 'Wedding & Banquet Setup',
+        caption: 'Newcombe Hall configured for weddings and receptions',
         urls: [
-          'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Film.webp.bv.webp',
-          'https://www.kingedwardhall.org.uk/wp-content/uploads/2026/01/cinema-display-frontal-view.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/al_opt_content/IMAGE/www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Wedding-1.webp.bv.webp',
+          'https://www.kingedwardhall.org.uk/wp-content/uploads/2024/01/NH-Wedding-1.webp',
           'images/newcombe-hall.jpg'
         ]
       }
