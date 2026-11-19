@@ -29,6 +29,9 @@ Welcome to the King Edward Hall Website Redesign documentation wiki. This knowle
    - Automated GitHub Actions test + build + deploy pipeline
    - Vite relative base configuration
    - Local preview server operations
+6. **[User Acceptance Testing (UAT) Plan](UAT-Test-Plan.md)**
+   - End-user test suites (`UAT-NAV`, `UAT-ROOM`, `UAT-CALC`, `UAT-EVT`, `UAT-CHAR`, `UAT-A11Y`)
+   - Persona checklists & committee sign-off sheet
 
 ---
 
