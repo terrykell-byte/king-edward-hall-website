@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { TabId } from './Header'
 import { SubNavPills, SubNavItem } from './SubNavPills'
+import { SmartImage } from './SmartImage'
 import { 
   Check, 
   Ticket, 
@@ -477,18 +478,29 @@ export const EventHubs: React.FC<EventHubsProps> = ({ currentEvent, setActiveTab
       {/* FILM NIGHTS HUB */}
       {currentEvent === 'film-nights' && (
         <div className="space-y-10 animate-in fade-in duration-200">
-          <div className="p-6 sm:p-12 rounded-2xl bg-gradient-to-br from-purple-900 to-brand-forest-dark text-white relative shadow-elevated border border-brand-brass/30">
-            <span className="px-3 py-1 rounded-full bg-purple-300 text-purple-950 text-xs font-bold uppercase mb-3 inline-block">
-              Village Cinema Experience
-            </span>
-            <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
-              Film Nights at King Edward Hall
-            </h1>
-            <p className="text-white/85 text-sm sm:text-base max-w-2xl leading-relaxed mb-4">
-              Enjoy celebrated movies in the comfort of Newcombe Hall with your fellow Lindfield residents. Screenings feature high-definition projection, full hall surround audio, comfortable tiered seating, and intermission refreshments.
-            </p>
-            <div className="text-xs sm:text-sm text-brand-brass-light font-bold">
-              Tickets: £9.00 per person • Tea, coffee &amp; homemade cakes available
+          <div className="rounded-2xl bg-gradient-to-br from-brand-forest to-brand-forest-dark text-white relative shadow-elevated border border-brand-brass/30 overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-center">
+            <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12">
+              <span className="px-3 py-1 rounded-full bg-brand-brass text-white text-xs font-bold uppercase mb-3 inline-block">
+                Village Cinema Experience
+              </span>
+              <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
+                Film Nights at King Edward Hall
+              </h1>
+              <p className="text-white/85 text-sm sm:text-base max-w-2xl leading-relaxed mb-4">
+                Enjoy celebrated movies in the comfort of Newcombe Hall with your fellow Lindfield residents. Screenings feature high-definition projection, full hall surround audio, comfortable tiered seating, and intermission refreshments.
+              </p>
+              <div className="text-xs sm:text-sm text-brand-brass-light font-bold">
+                Tickets: £9.00 per person • Tea, coffee &amp; homemade cakes available
+              </div>
+            </div>
+            <div className="lg:col-span-5 h-full">
+              <div className="relative aspect-[16/9] lg:aspect-auto lg:h-full w-full overflow-hidden border-t lg:border-t-0 lg:border-l border-brand-brass/25">
+                <SmartImage
+                  urls={['images/film-nights-cinema.jpg']}
+                  alt="Stylized vintage cinema illustration for Film Nights at King Edward Hall"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
             </div>
           </div>
 
